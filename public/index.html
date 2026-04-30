@@ -3,720 +3,1036 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Сравнение чисел</title>
+    <title>NumMatch — Сравнение чисел</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #080b14;
+            --surface: #0f1420;
+            --surface2: #161c2e;
+            --border: #1e2a42;
+            --accent: #4f8eff;
+            --accent2: #7c3aed;
+            --green: #22c55e;
+            --red: #ef4444;
+            --text: #e8edf8;
+            --muted: #4a5578;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --bronze: #b45309;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Syne', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            overflow-x: hidden;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: #667eea;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            font-size: 1.2em;
-            font-weight: bold;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .timer { color: #e74c3c; }
-        .score { color: #27ae60; }
-        .errors { color: #e74c3c; }
-
-        .start-screen, .game-screen, .result-screen {
-            display: none;
-        }
-
-        .start-screen.active, .game-screen.active, .result-screen.active {
-            display: block;
-        }
-
-        .start-btn, .restart-btn, .register-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 20px 50px;
-            font-size: 1.5em;
-            border-radius: 50px;
-            cursor: pointer;
-            display: block;
-            margin: 0 auto;
-            transition: transform 0.2s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .start-btn:hover, .restart-btn:hover, .register-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-
-        .numbers-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 40px 0;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .number {
-            font-size: 2em;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            background: #f8f9fa;
-            padding: 20px 30px;
-            border-radius: 10px;
-            letter-spacing: 2px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 40px;
-        }
-
-        .control-btn {
-            background: white;
-            border: 3px solid #ddd;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            font-size: 3em;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-
-        .check-btn { border-color: #27ae60; }
-        .check-btn:hover { background: #27ae60; }
-        .cross-btn { border-color: #e74c3c; }
-        .cross-btn:hover { background: #e74c3c; }
-
-        .error-animation {
+        /* Animated background grid */
+        body::before {
+            content: '';
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(231, 76, 60, 0.95);
-            color: white;
-            padding: 40px 60px;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(79,142,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79,142,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -40%;
+            left: -20%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse, rgba(79,142,255,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
             border-radius: 20px;
-            font-size: 2.5em;
-            font-weight: bold;
-            z-index: 1000;
-            animation: errorShake 0.5s;
-            display: none;
+            color: var(--muted);
+            letter-spacing: 0.05em;
         }
 
-        @keyframes errorShake {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            25% { transform: translate(-50%, -50%) rotate(-5deg); }
-            75% { transform: translate(-50%, -50%) rotate(5deg); }
-        }
+        /* SCREENS */
+        .screen { display: none; }
+        .screen.active { display: block; }
 
-        .error-animation.show { display: block; }
-
-        .leaderboard { margin-top: 30px; }
-
-        .leaderboard h2 {
-            color: #667eea;
+        /* REGISTRATION CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
             margin-bottom: 20px;
-            text-align: center;
         }
 
-        .leaderboard table {
-            width: 100%;
-            border-collapse: collapse;
+        .card-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
         }
 
-        .leaderboard th, .leaderboard td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .leaderboard th {
-            background: #667eea;
-            color: white;
-        }
-
-        .leaderboard tr:hover { background: #f8f9fa; }
-
-        .leaderboard .current-user {
-            background: #fff3cd;
-            font-weight: bold;
-        }
-
-        .result-score {
-            text-align: center;
-            font-size: 3em;
-            color: #27ae60;
-            margin: 30px 0;
-            font-weight: bold;
-        }
-
-        .registration-container {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .registration-container h3 {
-            color: #667eea;
-            margin-bottom: 20px;
+        .reg-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
         }
 
         .name-input {
-            padding: 10px 20px;
-            font-size: 1.2em;
-            border: 2px solid #667eea;
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
             border-radius: 10px;
-            margin-right: 10px;
-            min-width: 200px;
+            padding: 12px 16px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .register-btn {
-            padding: 10px 30px;
-            font-size: 1.2em;
-            display: inline-block;
-            margin: 0;
-        }
+        .name-input:focus { border-color: var(--accent); }
+        .name-input::placeholder { color: var(--muted); }
 
-        .registered-info {
-            background: #d4edda;
-            color: #155724;
-            padding: 20px;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
             border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: center;
+            padding: 12px 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            white-space: nowrap;
         }
 
-        .registered-info h3 { margin-bottom: 10px; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-        .instructions {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            line-height: 1.8;
-        }
-
-        .instructions h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .instructions ul { margin-left: 20px; }
-        .instructions li { margin-bottom: 10px; }
-
-        .medal {
-            font-size: 1.2em;
-            margin-right: 5px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-        }
-
-        .status-message {
-            text-align: center;
-            padding: 15px;
+        /* WELCOME BLOCK */
+        .welcome-block {
+            background: linear-gradient(135deg, rgba(79,142,255,0.08), rgba(124,58,237,0.08));
+            border: 1px solid rgba(79,142,255,0.2);
+            border-radius: 16px;
+            padding: 20px 28px;
             margin-bottom: 20px;
-            border-radius: 10px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
         }
 
-        .status-success {
-            background: #d4edda;
-            color: #155724;
+        .welcome-name {
+            font-size: 1.1rem;
+            font-weight: 700;
         }
 
-        .status-info {
-            background: #fff3cd;
-            color: #856404;
+        .welcome-record {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 4px;
         }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 1.8em; }
-            .number { font-size: 1.5em; padding: 15px 20px; }
-            .control-btn { width: 80px; height: 80px; font-size: 2.5em; }
-            .container { padding: 20px; }
+        .record-val {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        /* RULES */
+        .rules-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .rules-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #8a96b8;
+        }
+
+        .rule-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .rule-item strong { color: var(--text); }
+
+        /* BIG START BUTTON */
+        .btn-start {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 14px;
+            padding: 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            letter-spacing: 0.02em;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 24px rgba(79,142,255,0.25);
+        }
+
+        .btn-start:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,142,255,0.35); }
+        .btn-start:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* LEADERBOARD */
+        .lb-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .lb-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .lb-line { flex: 1; height: 1px; background: var(--border); }
+
+        .lb-table {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .lb-row {
+            display: grid;
+            grid-template-columns: 40px 1fr auto auto;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+            gap: 12px;
+        }
+
+        .lb-row:last-child { border-bottom: none; }
+        .lb-row:hover { background: var(--surface2); }
+        .lb-row.me { background: rgba(79,142,255,0.07); border-left: 2px solid var(--accent); }
+
+        .lb-rank {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .lb-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lb-name .you-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(79,142,255,0.12);
+            padding: 2px 7px;
+            border-radius: 20px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .lb-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        .lb-date {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .lb-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== GAME SCREEN ===== */
+        .game-hud {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hud-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+        }
+
+        .hud-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .hud-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .hud-value.red { color: var(--red); }
+        .hud-value.green { color: var(--green); }
+        .hud-value.accent { color: var(--accent); }
+
+        /* TIMER BAR */
+        .timer-bar-wrap {
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--accent));
+            border-radius: 2px;
+            transition: width 1s linear, background-color 0.5s;
+        }
+
+        .timer-bar.danger {
+            background: linear-gradient(90deg, var(--red), #f97316);
+        }
+
+        /* NUMBERS DISPLAY - THE KEY FIX */
+        .numbers-arena {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 20px;
+            margin-bottom: 20px;
+        }
+
+        .numbers-pair {
+            display: grid;
+            /* Always side by side, equal width - THIS IS THE CHEAT FIX */
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .num-box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 8px;
+            text-align: center;
+            /* Fixed width boxes = can't tell length difference */
+            overflow: hidden;
+        }
+
+        .num-box span {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            color: var(--text);
+            display: block;
+            /* Scale font to fit — never overflow */
+            word-break: break-all;
+            line-height: 1.4;
+            /* Responsive font size */
+            font-size: clamp(0.75rem, 2.2vw, 1.15rem);
+        }
+
+        .num-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        .divider-line { flex: 1; height: 1px; background: var(--border); }
+
+        .divider-text {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* ANSWER BUTTONS */
+        .answer-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-check, .btn-cross {
+            border: none;
+            border-radius: 14px;
+            padding: 20px 16px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.12s, opacity 0.15s, box-shadow 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-check {
+            background: rgba(34,197,94,0.12);
+            border: 1.5px solid rgba(34,197,94,0.3);
+            color: var(--green);
+        }
+
+        .btn-cross {
+            background: rgba(239,68,68,0.12);
+            border: 1.5px solid rgba(239,68,68,0.3);
+            color: var(--red);
+        }
+
+        .btn-check:hover { background: rgba(34,197,94,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
+        .btn-cross:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(239,68,68,0.15); }
+        .btn-check:active, .btn-cross:active { transform: scale(0.96); }
+
+        .btn-icon { font-size: 2rem; line-height: 1; }
+        .btn-label { font-size: 0.75rem; opacity: 0.7; }
+
+        /* ERROR FLASH */
+        .error-flash {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .error-pill {
+            background: var(--red);
+            color: white;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            opacity: 0;
+            transform: scale(0.7) translateY(-20px);
+            transition: opacity 0.15s, transform 0.15s;
+            box-shadow: 0 8px 32px rgba(239,68,68,0.4);
+        }
+
+        .error-pill.show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* RESULT SCREEN */
+        .result-hero {
+            text-align: center;
+            padding: 40px 20px 28px;
+        }
+
+        .result-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .result-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .status-banner {
+            border-radius: 12px;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .status-banner.success {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.25);
+            color: var(--green);
+        }
+
+        .status-banner.info {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.25);
+            color: var(--gold);
+        }
+
+        .btn-restart {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover { border-color: var(--accent); background: rgba(79,142,255,0.06); }
+
+        /* Pulse animation for correct answer */
+        @keyframes correctPulse {
+            0% { border-color: var(--border); }
+            50% { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+            100% { border-color: var(--border); }
+        }
+
+        .num-box.correct-flash {
+            animation: correctPulse 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .numbers-arena.shake {
+            animation: shake 0.35s ease;
+        }
+
+        /* Loading dots */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 32px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            .header { margin-bottom: 20px; }
+            .result-number { font-size: 4rem; }
+            .game-hud { gap: 8px; }
+            .hud-value { font-size: 1.2rem; }
+            .btn-check, .btn-cross { padding: 16px 12px; }
+            .num-box span { font-size: clamp(0.65rem, 3.5vw, 0.95rem); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎯 Игра: Сравнение чисел</h1>
+<div class="wrap">
 
-        <!-- Start Screen -->
-        <div class="start-screen active">
-            <div id="registrationBlock" class="registration-container" style="display: none;">
-                <h3>👤 Регистрация</h3>
-                <p style="margin-bottom: 15px;">Введите ваше имя для участия в игре:</p>
-                <input type="text" class="name-input" id="registerName" placeholder="Ваше имя" maxlength="20">
-                <button class="register-btn" onclick="registerName()">✅ Зарегистрироваться</button>
-            </div>
+    <header class="header">
+        <div class="logo">Num<span>Match</span></div>
+        <div class="badge">v2.0</div>
+    </header>
 
-            <div id="registeredBlock" class="registered-info" style="display: none;">
-                <h3>👋 Добро пожаловать!</h3>
-                <p>Вы играете как: <strong id="displayName"></strong></p>
-                <p style="font-size: 0.9em; margin-top: 10px;">Ваш лучший результат: <strong id="bestScore">0</strong></p>
-            </div>
+    <!-- ===== START SCREEN ===== -->
+    <div class="screen active" id="screenStart">
 
-            <div class="instructions">
-                <h3>📋 Правила игры:</h3>
-                <ul>
-                    <li>У вас есть <strong>2 минуты</strong> на игру</li>
-                    <li>На экране появятся два похожих числа</li>
-                    <li>Если числа <strong>одинаковые</strong> - нажмите ✓ (галочка)</li>
-                    <li>Если числа <strong>разные</strong> - нажмите ✗ (крестик)</li>
-                    <li>Допускается только <strong>2 ошибки</strong></li>
-                    <li>Будьте внимательны - числа очень похожи!</li>
-                </ul>
-            </div>
-            <button class="start-btn" id="startGameBtn" onclick="startGame()" disabled style="opacity: 0.5; cursor: not-allowed;">Начать игру</button>
-            
-            <div class="leaderboard">
-                <h2>🏆 Таблица лидеров</h2>
-                <div id="startLeaderboardContainer">
-                    <div class="loading">Загрузка...</div>
-                </div>
+        <!-- Registration (new user) -->
+        <div id="regBlock" class="card" style="display:none">
+            <div class="card-label">👤 Регистрация</div>
+            <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">Введите имя — оно будет зафиксировано навсегда</p>
+            <div class="reg-row">
+                <input class="name-input" id="regInput" type="text" placeholder="Ваш ник" maxlength="20"
+                    onkeydown="if(event.key==='Enter') registerName()">
+                <button class="btn-primary" onclick="registerName()">Войти →</button>
             </div>
         </div>
 
-        <!-- Game Screen -->
-        <div class="game-screen">
-            <div class="game-info">
-                <div class="timer">⏱️ Время: <span id="timer">120</span>с</div>
-                <div class="score">✓ Правильно: <span id="score">0</span></div>
-                <div class="errors">✗ Ошибки: <span id="errors">0</span>/2</div>
+        <!-- Welcome (returning user) -->
+        <div id="welcomeBlock" class="welcome-block" style="display:none">
+            <div>
+                <div class="welcome-name" id="welcomeName">—</div>
+                <div class="welcome-record">Лучший результат: <span class="record-val" id="welcomeRecord">0</span></div>
             </div>
+            <div class="avatar">🎯</div>
+        </div>
 
-            <div class="numbers-container">
-                <div class="number" id="number1">123456</div>
-                <div class="number" id="number2">123456</div>
-            </div>
-
-            <div class="controls">
-                <button class="control-btn check-btn" onclick="checkAnswer(true)">✓</button>
-                <button class="control-btn cross-btn" onclick="checkAnswer(false)">✗</button>
+        <!-- Rules -->
+        <div class="rules-card">
+            <div class="card-label">📋 Правила</div>
+            <div class="rules-grid">
+                <div class="rule-item"><div class="rule-icon">⏱</div><span><strong>2 минуты</strong> на сессию</span></div>
+                <div class="rule-item"><div class="rule-icon">✓</div><span>Числа <strong>одинаковые</strong> → жми галочку</span></div>
+                <div class="rule-item"><div class="rule-icon">✗</div><span>Числа <strong>разные</strong> → жми крестик</span></div>
+                <div class="rule-item"><div class="rule-icon">❌</div><span>Максимум <strong>2 ошибки</strong></span></div>
             </div>
         </div>
 
-        <!-- Result Screen -->
-        <div class="result-screen">
-            <div id="statusMessageContainer"></div>
+        <button class="btn-start" id="btnStart" onclick="startGame()" disabled>Начать игру</button>
 
-            <div class="result-score">
-                Ваш результат: <span id="finalScore">0</span>
-            </div>
-
-            <div class="leaderboard">
-                <h2>🏆 Таблица лидеров</h2>
-                <div id="resultLeaderboardContainer">
-                    <div class="loading">Загрузка...</div>
-                </div>
-            </div>
-
-            <button class="restart-btn" onclick="restartGame()">🔄 Играть снова</button>
+        <div class="lb-header">
+            <div class="lb-title">Таблица лидеров</div>
+            <div class="lb-line"></div>
         </div>
-
-        <div class="error-animation" id="errorAnim">❌ ОШИБКА!</div>
+        <div class="lb-table" id="lbStart"><div class="loading">Загрузка...</div></div>
     </div>
 
-    <script>
-        // API endpoints (Netlify Functions)
-        const API_LEADERBOARD = '/api/leaderboard';
-        const API_SAVE = '/api/save';
+    <!-- ===== GAME SCREEN ===== -->
+    <div class="screen" id="screenGame">
+        <div class="game-hud">
+            <div class="hud-item">
+                <div class="hud-label">Время</div>
+                <div class="hud-value accent" id="hudTimer">120</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">Правильно</div>
+                <div class="hud-value green" id="hudScore">0</div>
+            </div>
+            <div class="hud-item">
+                <div class="hud-label">Ошибки</div>
+                <div class="hud-value red" id="hudErrors">0/2</div>
+            </div>
+        </div>
 
-        let gameState = {
-            score: 0,
-            errors: 0,
-            timeLeft: 120,
-            currentNumbers: { num1: '', num2: '', match: false },
-            timerInterval: null,
-            userId: null,
-            userName: null,
-            isRegistered: false
-        };
+        <div class="timer-bar-wrap">
+            <div class="timer-bar" id="timerBar"></div>
+        </div>
 
-        // Генерация userId через localStorage
-        function getOrCreateUserId() {
-            let userId = localStorage.getItem('gameUserId');
-            
-            if (!userId) {
-                userId = 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 12);
-                localStorage.setItem('gameUserId', userId);
-            }
-            
-            return userId;
+        <div class="numbers-arena" id="arena">
+            <div class="numbers-pair">
+                <div class="num-box" id="numBoxA"><span id="numA">—</span></div>
+                <div class="num-box" id="numBoxB"><span id="numB">—</span></div>
+            </div>
+            <div class="num-divider">
+                <div class="divider-line"></div>
+                <div class="divider-text">совпадают?</div>
+                <div class="divider-line"></div>
+            </div>
+        </div>
+
+        <div class="answer-btns">
+            <button class="btn-check" onclick="answer(true)">
+                <div class="btn-icon">✓</div>
+                <div class="btn-label">Одинаковые</div>
+            </button>
+            <button class="btn-cross" onclick="answer(false)">
+                <div class="btn-icon">✗</div>
+                <div class="btn-label">Разные</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== RESULT SCREEN ===== -->
+    <div class="screen" id="screenResult">
+        <div class="result-hero">
+            <div class="result-label">Ваш результат</div>
+            <div class="result-number" id="resultNum">0</div>
+            <div class="result-sub" id="resultSub">правильных ответов</div>
+        </div>
+
+        <div id="statusBanner"></div>
+
+        <div class="lb-header">
+            <div class="lb-title">Таблица лидеров</div>
+            <div class="lb-line"></div>
+        </div>
+        <div class="lb-table" id="lbResult"><div class="loading">Загрузка...</div></div>
+
+        <button class="btn-restart" onclick="restartGame()">↩ Играть снова</button>
+    </div>
+
+</div>
+
+<!-- Error flash overlay -->
+<div class="error-flash" id="errFlash">
+    <div class="error-pill" id="errPill">❌ Ошибка!</div>
+</div>
+
+<script>
+    const API_LB   = '/api/leaderboard';
+    const API_SAVE = '/api/save';
+
+    const gs = {
+        score: 0, errors: 0, timeLeft: 120,
+        cur: null, interval: null,
+        userId: null, userName: null, registered: false
+    };
+
+    // UserId via localStorage
+    function getUserId() {
+        let id = localStorage.getItem('nm_uid');
+        if (!id) {
+            id = 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 10);
+            localStorage.setItem('nm_uid', id);
         }
+        return id;
+    }
+    gs.userId = getUserId();
 
-        gameState.userId = getOrCreateUserId();
+    // ─── Number Generation ───────────────────────────────────────
+    function genNumbers() {
+        const len = Math.floor(Math.random() * 10) + 6; // 6-15
+        let base = '';
+        for (let i = 0; i < len; i++) base += Math.floor(Math.random() * 10);
 
-        // Регистрация имени
-        async function registerName() {
-            const nameInput = document.getElementById('registerName');
-            const name = nameInput.value.trim();
+        if (Math.random() < 0.5) return { a: base, b: base, match: true };
 
-            if (!name) {
-                alert('Пожалуйста, введите имя!');
-                return;
+        let mod = base.split('');
+        const t = Math.random();
+        if (t < 0.4) {
+            // Insert digit
+            const pos = Math.floor(Math.random() * mod.length);
+            mod.splice(pos, 0, String(Math.floor(Math.random() * 10)));
+        } else if (t < 0.7 && mod.length > 6) {
+            // Delete digit
+            mod.splice(Math.floor(Math.random() * mod.length), 1);
+        } else {
+            // Change digit
+            const pos = Math.floor(Math.random() * mod.length);
+            mod[pos] = String((parseInt(mod[pos]) + 1 + Math.floor(Math.random() * 8)) % 10);
+        }
+        return { a: base, b: mod.join(''), match: false };
+    }
+
+    function showNumbers() {
+        gs.cur = genNumbers();
+        document.getElementById('numA').textContent = gs.cur.a;
+        document.getElementById('numB').textContent = gs.cur.b;
+    }
+
+    // ─── Game Logic ───────────────────────────────────────────────
+    function startGame() {
+        if (!gs.registered) return;
+        gs.score = 0; gs.errors = 0; gs.timeLeft = 120;
+        showScreen('screenGame');
+        updateHUD();
+        showNumbers();
+        gs.interval = setInterval(tick, 1000);
+    }
+
+    function tick() {
+        gs.timeLeft--;
+        updateHUD();
+        if (gs.timeLeft <= 0) endGame();
+    }
+
+    function updateHUD() {
+        document.getElementById('hudTimer').textContent = gs.timeLeft;
+        document.getElementById('hudScore').textContent = gs.score;
+        document.getElementById('hudErrors').textContent = gs.errors + '/2';
+        const pct = (gs.timeLeft / 120) * 100;
+        const bar = document.getElementById('timerBar');
+        bar.style.width = pct + '%';
+        bar.className = 'timer-bar' + (pct < 25 ? ' danger' : '');
+    }
+
+    function answer(userSaysMatch) {
+        if (userSaysMatch === gs.cur.match) {
+            gs.score++;
+            // Subtle correct flash
+            ['numBoxA','numBoxB'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('correct-flash');
+                setTimeout(() => el.classList.remove('correct-flash'), 300);
+            });
+            updateHUD();
+            showNumbers();
+        } else {
+            gs.errors++;
+            updateHUD();
+            // Shake + error overlay
+            const arena = document.getElementById('arena');
+            arena.classList.add('shake');
+            setTimeout(() => arena.classList.remove('shake'), 400);
+            showError();
+            if (gs.errors >= 2) { setTimeout(endGame, 400); return; }
+            showNumbers();
+        }
+    }
+
+    function showError() {
+        const pill = document.getElementById('errPill');
+        pill.classList.add('show');
+        setTimeout(() => pill.classList.remove('show'), 700);
+    }
+
+    async function endGame() {
+        clearInterval(gs.interval);
+        document.getElementById('resultNum').textContent = gs.score;
+        showScreen('screenResult');
+        document.getElementById('lbResult').innerHTML = '<div class="loading">Загрузка...</div>';
+        document.getElementById('statusBanner').innerHTML = '';
+
+        // Auto-save
+        await autoSave();
+        await renderLB('lbResult');
+    }
+
+    async function autoSave() {
+        try {
+            const r = await fetch(API_SAVE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: gs.userName, score: gs.score, userId: gs.userId })
+            });
+            const res = await r.json();
+            const banner = document.getElementById('statusBanner');
+            if (res.status === 'updated') {
+                banner.innerHTML = '<div class="status-banner success">🎉 Новый рекорд! Результат сохранён!</div>';
+            } else if (res.status === 'ignored') {
+                const best = await getBestScore();
+                banner.innerHTML = `<div class="status-banner info">Ваш рекорд: ${best} — не побит</div>`;
+            } else if (res.status === 'ok') {
+                banner.innerHTML = '<div class="status-banner success">✓ Результат сохранён</div>';
+            }
+        } catch(e) {
+            console.error('Save error:', e);
+        }
+    }
+
+    async function getBestScore() {
+        try {
+            const data = await fetch(API_LB).then(r => r.json());
+            const me = (Array.isArray(data) ? data : []).find(e => e.userId === gs.userId);
+            return me ? me.score : gs.score;
+        } catch { return gs.score; }
+    }
+
+    function restartGame() {
+        showScreen('screenStart');
+        renderLB('lbStart');
+        if (gs.registered) {
+            // Update best score display
+            getBestScore().then(s => {
+                document.getElementById('welcomeRecord').textContent = s;
+            });
+        }
+    }
+
+    // ─── Leaderboard ──────────────────────────────────────────────
+    async function renderLB(containerId) {
+        const el = document.getElementById(containerId);
+        try {
+            const raw = await fetch(API_LB).then(r => r.json());
+            const lb = Array.isArray(raw) ? raw : [];
+
+            if (lb.length === 0) {
+                el.innerHTML = '<div class="lb-empty">Пока нет результатов — будь первым!</div>';
+                return lb;
             }
 
-            try {
-                const response = await fetch(API_SAVE, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: name,
-                        score: 0,
-                        userId: gameState.userId
-                    })
-                });
+            const medals = ['🥇','🥈','🥉'];
+            el.innerHTML = lb.map((e, i) => {
+                const isMe = e.userId === gs.userId;
+                const rank = i < 3 ? medals[i] : `#${i+1}`;
+                return `<div class="lb-row${isMe ? ' me' : ''}">
+                    <div class="lb-rank">${rank}</div>
+                    <div class="lb-name">${e.name}${isMe ? '<span class="you-tag">ВЫ</span>' : ''}</div>
+                    <div class="lb-score">${e.score}</div>
+                    <div class="lb-date">${e.date}</div>
+                </div>`;
+            }).join('');
 
-                const result = await response.json();
-
-                if (result.status === 'ignored') {
-                    alert(result.message);
-                } else if (result.status === 'ok') {
-                    gameState.userName = name;
-                    gameState.isRegistered = true;
-                    showRegisteredUI();
-                    await loadLeaderboard(true);
-                } else {
-                    alert('Ошибка регистрации: ' + (result.message || 'неизвестная ошибка'));
-                }
-
-            } catch (error) {
-                console.error('Error registering:', error);
-                alert('Ошибка при регистрации. Проверьте подключение.');
+            // Update welcome record if on start screen
+            if (containerId === 'lbStart' && gs.registered) {
+                const me = lb.find(e => e.userId === gs.userId);
+                if (me) document.getElementById('welcomeRecord').textContent = me.score;
             }
-        }
 
-        function showRegisteredUI() {
-            document.getElementById('registrationBlock').style.display = 'none';
-            document.getElementById('registeredBlock').style.display = 'block';
-            document.getElementById('displayName').textContent = gameState.userName;
-            
-            const startBtn = document.getElementById('startGameBtn');
-            startBtn.disabled = false;
-            startBtn.style.opacity = '1';
-            startBtn.style.cursor = 'pointer';
+            return lb;
+        } catch(err) {
+            el.innerHTML = '<div class="lb-empty">Ошибка загрузки</div>';
+            return [];
         }
+    }
 
-        function showRegistrationUI() {
-            document.getElementById('registrationBlock').style.display = 'block';
-            document.getElementById('registeredBlock').style.display = 'none';
-            
-            const startBtn = document.getElementById('startGameBtn');
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.5';
-            startBtn.style.cursor = 'not-allowed';
-        }
+    // ─── Registration ─────────────────────────────────────────────
+    async function registerName() {
+        const input = document.getElementById('regInput');
+        const name = input.value.trim();
+        if (!name) { input.focus(); return; }
 
-        function generateSimilarNumbers() {
-            const length = Math.floor(Math.random() * 10) + 6;
-            let baseNumber = '';
-            
-            for (let i = 0; i < length; i++) {
-                baseNumber += Math.floor(Math.random() * 10);
-            }
-            
-            const shouldMatch = Math.random() < 0.5;
-            
-            if (shouldMatch) {
-                return { num1: baseNumber, num2: baseNumber, match: true };
+        const btn = input.nextElementSibling;
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        try {
+            const r = await fetch(API_SAVE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, score: 0, userId: gs.userId })
+            });
+            const res = await r.json();
+
+            if (res.status === 'ok') {
+                gs.userName = name;
+                gs.registered = true;
+                showWelcome(name, 0);
+                renderLB('lbStart');
+            } else if (res.status === 'ignored') {
+                alert(res.message);
+                btn.disabled = false;
+                btn.textContent = 'Войти →';
             } else {
-                let modifiedNumber = baseNumber.split('');
-                const modificationType = Math.random();
-                
-                if (modificationType < 0.4) {
-                    const pos = Math.floor(Math.random() * modifiedNumber.length);
-                    modifiedNumber.splice(pos, 0, Math.floor(Math.random() * 10).toString());
-                } else if (modificationType < 0.7) {
-                    if (modifiedNumber.length > 6) {
-                        const pos = Math.floor(Math.random() * modifiedNumber.length);
-                        modifiedNumber.splice(pos, 1);
-                    } else {
-                        const pos = Math.floor(Math.random() * modifiedNumber.length);
-                        modifiedNumber[pos] = ((parseInt(modifiedNumber[pos]) + 1) % 10).toString();
-                    }
-                } else {
-                    const pos = Math.floor(Math.random() * modifiedNumber.length);
-                    modifiedNumber[pos] = ((parseInt(modifiedNumber[pos]) + 1) % 10).toString();
-                }
-                
-                return { num1: baseNumber, num2: modifiedNumber.join(''), match: false };
+                alert('Ошибка: ' + (res.message || 'попробуйте снова'));
+                btn.disabled = false;
+                btn.textContent = 'Войти →';
             }
+        } catch(e) {
+            alert('Ошибка подключения');
+            btn.disabled = false;
+            btn.textContent = 'Войти →';
         }
+    }
 
-        function displayNewNumbers() {
-            gameState.currentNumbers = generateSimilarNumbers();
-            document.getElementById('number1').textContent = gameState.currentNumbers.num1;
-            document.getElementById('number2').textContent = gameState.currentNumbers.num2;
+    function showWelcome(name, score) {
+        document.getElementById('regBlock').style.display = 'none';
+        document.getElementById('welcomeBlock').style.display = 'flex';
+        document.getElementById('welcomeName').textContent = name;
+        document.getElementById('welcomeRecord').textContent = score;
+        const btn = document.getElementById('btnStart');
+        btn.disabled = false;
+    }
+
+    // ─── Screen Management ────────────────────────────────────────
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────
+    window.onload = async () => {
+        const lb = await renderLB('lbStart');
+        const me = lb.find(e => e.userId === gs.userId);
+
+        if (me) {
+            gs.userName = me.name;
+            gs.registered = true;
+            showWelcome(me.name, me.score);
+        } else {
+            document.getElementById('regBlock').style.display = 'block';
         }
-
-        function startGame() {
-            if (!gameState.isRegistered) {
-                alert('Сначала зарегистрируйтесь!');
-                return;
-            }
-
-            gameState.score = 0;
-            gameState.errors = 0;
-            gameState.timeLeft = 120;
-            
-            document.querySelector('.start-screen').classList.remove('active');
-            document.querySelector('.game-screen').classList.add('active');
-            
-            updateDisplay();
-            displayNewNumbers();
-            startTimer();
-        }
-
-        function startTimer() {
-            gameState.timerInterval = setInterval(() => {
-                gameState.timeLeft--;
-                document.getElementById('timer').textContent = gameState.timeLeft;
-                
-                if (gameState.timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-        }
-
-        function checkAnswer(userSaysMatch) {
-            const correct = userSaysMatch === gameState.currentNumbers.match;
-            
-            if (correct) {
-                gameState.score++;
-                updateDisplay();
-                displayNewNumbers();
-            } else {
-                gameState.errors++;
-                updateDisplay();
-                showError();
-                
-                if (gameState.errors >= 2) {
-                    endGame();
-                } else {
-                    displayNewNumbers();
-                }
-            }
-        }
-
-        function showError() {
-            const errorAnim = document.getElementById('errorAnim');
-            errorAnim.classList.add('show');
-            
-            setTimeout(() => {
-                errorAnim.classList.remove('show');
-            }, 500);
-        }
-
-        function updateDisplay() {
-            document.getElementById('score').textContent = gameState.score;
-            document.getElementById('errors').textContent = gameState.errors;
-        }
-
-        async function endGame() {
-            clearInterval(gameState.timerInterval);
-            
-            document.querySelector('.game-screen').classList.remove('active');
-            document.querySelector('.result-screen').classList.add('active');
-            
-            document.getElementById('finalScore').textContent = gameState.score;
-            
-            await autoSaveScore();
-            await loadLeaderboard(false);
-        }
-
-        async function autoSaveScore() {
-            const statusContainer = document.getElementById('statusMessageContainer');
-            statusContainer.innerHTML = '';
-
-            try {
-                const response = await fetch(API_SAVE, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: gameState.userName,
-                        score: gameState.score,
-                        userId: gameState.userId
-                    })
-                });
-
-                const result = await response.json();
-
-                let message = '';
-                let messageClass = '';
-
-                if (result.status === 'updated') {
-                    message = '🎉 Новый рекорд! Результат автоматически сохранён!';
-                    messageClass = 'status-success';
-                } else if (result.status === 'ignored') {
-                    const currentBest = await getCurrentBestScore();
-                    message = `Ваш предыдущий рекорд лучше: ${currentBest}`;
-                    messageClass = 'status-info';
-                } else if (result.status === 'ok') {
-                    message = '✅ Результат сохранён!';
-                    messageClass = 'status-success';
-                }
-
-                if (message) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = `status-message ${messageClass}`;
-                    msgDiv.textContent = message;
-                    statusContainer.appendChild(msgDiv);
-                }
-
-            } catch (error) {
-                console.error('Error saving score:', error);
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'status-message status-info';
-                msgDiv.textContent = 'Ошибка сохранения результата';
-                statusContainer.appendChild(msgDiv);
-            }
-        }
-
-        async function getCurrentBestScore() {
-            try {
-                const response = await fetch(API_LEADERBOARD);
-                const leaderboard = await response.json();
-                const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
-                return myEntry ? myEntry.score : 0;
-            } catch {
-                return 0;
-            }
-        }
-
-        async function loadLeaderboard(isStartScreen) {
-            const containerId = isStartScreen ? 'startLeaderboardContainer' : 'resultLeaderboardContainer';
-            const container = document.getElementById(containerId);
-            
-            try {
-                const response = await fetch(API_LEADERBOARD);
-                const raw = await response.json();
-
-                // Защита: если сервер вернул ошибку вместо массива
-                const leaderboard = Array.isArray(raw) ? raw : [];
-
-                if (leaderboard.length === 0) {
-                    container.innerHTML = '<div class="loading">Пока нет результатов</div>';
-                    return [];
-                }
-                
-                const medals = ['🥇', '🥈', '🥉'];
-                let html = '<table><thead><tr><th>Место</th><th>Имя</th><th>Результат</th><th>Дата</th></tr></thead><tbody>';
-                
-                leaderboard.forEach((entry, index) => {
-                    const medal = index < 3 ? `<span class="medal">${medals[index]}</span>` : '';
-                    const isCurrentUser = entry.userId === gameState.userId;
-                    const rowClass = isCurrentUser ? 'current-user' : '';
-                    
-                    html += `
-                        <tr class="${rowClass}">
-                            <td>${medal}${index + 1}</td>
-                            <td>${entry.name}${isCurrentUser ? ' (Вы)' : ''}</td>
-                            <td><strong>${entry.score}</strong></td>
-                            <td>${entry.date}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-                container.innerHTML = html;
-
-                if (isStartScreen && gameState.isRegistered) {
-                    const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
-                    if (myEntry) {
-                        document.getElementById('bestScore').textContent = myEntry.score;
-                    }
-                }
-
-                return leaderboard;
-                
-            } catch (error) {
-                console.error('Error loading leaderboard:', error);
-                container.innerHTML = '<div class="loading">Ошибка загрузки</div>';
-                return [];
-            }
-        }
-
-        function restartGame() {
-            document.getElementById('statusMessageContainer').innerHTML = '';
-            document.querySelector('.result-screen').classList.remove('active');
-            document.querySelector('.start-screen').classList.add('active');
-        }
-
-        window.onload = async () => {
-            console.log('User ID:', gameState.userId);
-
-            try {
-                // loadLeaderboard теперь возвращает массив
-                const leaderboard = await loadLeaderboard(true);
-                
-                const myEntry = (leaderboard || []).find(entry => entry.userId === gameState.userId);
-                
-                if (myEntry) {
-                    gameState.userName = myEntry.name;
-                    gameState.isRegistered = true;
-                    showRegisteredUI();
-                    document.getElementById('bestScore').textContent = myEntry.score;
-                    console.log('Пользователь уже зарегистрирован:', myEntry.name);
-                } else {
-                    showRegistrationUI();
-                    console.log('Пользователь не зарегистрирован');
-                }
-            } catch (e) {
-                console.error('Ошибка загрузки:', e);
-                showRegistrationUI();
-            }
-        };
-    </script>
+    };
+</script>
 </body>
 </html>
