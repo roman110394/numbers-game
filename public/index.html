@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра: Сравнение чисел</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .timer { color: #e74c3c; }
+        .score { color: #27ae60; }
+        .errors { color: #e74c3c; }
+
+        .start-screen, .game-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .game-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-btn, .restart-btn, .register-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .start-btn:hover, .restart-btn:hover, .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .numbers-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .number {
+            font-size: 2em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-radius: 10px;
+            letter-spacing: 2px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .control-btn {
+            background: white;
+            border: 3px solid #ddd;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            font-size: 3em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .check-btn { border-color: #27ae60; }
+        .check-btn:hover { background: #27ae60; }
+        .cross-btn { border-color: #e74c3c; }
+        .cross-btn:hover { background: #e74c3c; }
+
+        .error-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            font-size: 2.5em;
+            font-weight: bold;
+            z-index: 1000;
+            animation: errorShake 0.5s;
+            display: none;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+        }
+
+        .error-animation.show { display: block; }
+
+        .leaderboard { margin-top: 30px; }
+
+        .leaderboard h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard th, .leaderboard td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .leaderboard th {
+            background: #667eea;
+            color: white;
+        }
+
+        .leaderboard tr:hover { background: #f8f9fa; }
+
+        .leaderboard .current-user {
+            background: #fff3cd;
+            font-weight: bold;
+        }
+
+        .result-score {
+            text-align: center;
+            font-size: 3em;
+            color: #27ae60;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .registration-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .registration-container h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .name-input {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            margin-right: 10px;
+            min-width: 200px;
+        }
+
+        .register-btn {
+            padding: 10px 30px;
+            font-size: 1.2em;
+            display: inline-block;
+            margin: 0;
+        }
+
+        .registered-info {
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .registered-info h3 { margin-bottom: 10px; }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul { margin-left: 20px; }
+        .instructions li { margin-bottom: 10px; }
+
+        .medal {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-info {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .number { font-size: 1.5em; padding: 15px 20px; }
+            .control-btn { width: 80px; height: 80px; font-size: 2.5em; }
+            .container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Игра: Сравнение чисел</h1>
+
+        <!-- Start Screen -->
+        <div class="start-screen active">
+            <div id="registrationBlock" class="registration-container" style="display: none;">
+                <h3>👤 Регистрация</h3>
+                <p style="margin-bottom: 15px;">Введите ваше имя для участия в игре:</p>
+                <input type="text" class="name-input" id="registerName" placeholder="Ваше имя" maxlength="20">
+                <button class="register-btn" onclick="registerName()">✅ Зарегистрироваться</button>
+            </div>
+
+            <div id="registeredBlock" class="registered-info" style="display: none;">
+                <h3>👋 Добро пожаловать!</h3>
+                <p>Вы играете как: <strong id="displayName"></strong></p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Ваш лучший результат: <strong id="bestScore">0</strong></p>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Правила игры:</h3>
+                <ul>
+                    <li>У вас есть <strong>2 минуты</strong> на игру</li>
+                    <li>На экране появятся два похожих числа</li>
+                    <li>Если числа <strong>одинаковые</strong> - нажмите ✓ (галочка)</li>
+                    <li>Если числа <strong>разные</strong> - нажмите ✗ (крестик)</li>
+                    <li>Допускается только <strong>2 ошибки</strong></li>
+                    <li>Будьте внимательны - числа очень похожи!</li>
+                </ul>
+            </div>
+            <button class="start-btn" id="startGameBtn" onclick="startGame()" disabled style="opacity: 0.5; cursor: not-allowed;">Начать игру</button>
+            
+            <div class="leaderboard">
+                <h2>🏆 Таблица лидеров</h2>
+                <div id="startLeaderboardContainer">
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen">
+            <div class="game-info">
+                <div class="timer">⏱️ Время: <span id="timer">120</span>с</div>
+                <div class="score">✓ Правильно: <span id="score">0</span></div>
+                <div class="errors">✗ Ошибки: <span id="errors">0</span>/2</div>
+            </div>
+
+            <div class="numbers-container">
+                <div class="number" id="number1">123456</div>
+                <div class="number" id="number2">123456</div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn check-btn" onclick="checkAnswer(true)">✓</button>
+                <button class="control-btn cross-btn" onclick="checkAnswer(false)">✗</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-screen">
+            <div id="statusMessageContainer"></div>
+
+            <div class="result-score">
+                Ваш результат: <span id="finalScore">0</span>
+            </div>
+
+            <div class="leaderboard">
+                <h2>🏆 Таблица лидеров</h2>
+                <div id="resultLeaderboardContainer">
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+
+            <button class="restart-btn" onclick="restartGame()">🔄 Играть снова</button>
+        </div>
+
+        <div class="error-animation" id="errorAnim">❌ ОШИБКА!</div>
+    </div>
+
+    <script>
+        // API endpoints (Netlify Functions)
+        const API_LEADERBOARD = '/api/leaderboard';
+        const API_SAVE = '/api/save';
+
+        let gameState = {
+            score: 0,
+            errors: 0,
+            timeLeft: 120,
+            currentNumbers: { num1: '', num2: '', match: false },
+            timerInterval: null,
+            userId: null,
+            userName: null,
+            isRegistered: false
+        };
+
+        // Генерация userId через localStorage
+        function getOrCreateUserId() {
+            let userId = localStorage.getItem('gameUserId');
+            
+            if (!userId) {
+                userId = 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 12);
+                localStorage.setItem('gameUserId', userId);
+            }
+            
+            return userId;
+        }
+
+        gameState.userId = getOrCreateUserId();
+
+        // Регистрация имени
+        async function registerName() {
+            const nameInput = document.getElementById('registerName');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('Пожалуйста, введите имя!');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_SAVE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        score: 0,
+                        userId: gameState.userId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'ignored') {
+                    alert(result.message);
+                } else if (result.status === 'ok') {
+                    gameState.userName = name;
+                    gameState.isRegistered = true;
+                    showRegisteredUI();
+                    await loadLeaderboard(true);
+                } else {
+                    alert('Ошибка регистрации: ' + (result.message || 'неизвестная ошибка'));
+                }
+
+            } catch (error) {
+                console.error('Error registering:', error);
+                alert('Ошибка при регистрации. Проверьте подключение.');
+            }
+        }
+
+        function showRegisteredUI() {
+            document.getElementById('registrationBlock').style.display = 'none';
+            document.getElementById('registeredBlock').style.display = 'block';
+            document.getElementById('displayName').textContent = gameState.userName;
+            
+            const startBtn = document.getElementById('startGameBtn');
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            startBtn.style.cursor = 'pointer';
+        }
+
+        function showRegistrationUI() {
+            document.getElementById('registrationBlock').style.display = 'block';
+            document.getElementById('registeredBlock').style.display = 'none';
+            
+            const startBtn = document.getElementById('startGameBtn');
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.5';
+            startBtn.style.cursor = 'not-allowed';
+        }
+
+        function generateSimilarNumbers() {
+            const length = Math.floor(Math.random() * 10) + 6;
+            let baseNumber = '';
+            
+            for (let i = 0; i < length; i++) {
+                baseNumber += Math.floor(Math.random() * 10);
+            }
+            
+            const shouldMatch = Math.random() < 0.5;
+            
+            if (shouldMatch) {
+                return { num1: baseNumber, num2: baseNumber, match: true };
+            } else {
+                let modifiedNumber = baseNumber.split('');
+                const modificationType = Math.random();
+                
+                if (modificationType < 0.4) {
+                    const pos = Math.floor(Math.random() * modifiedNumber.length);
+                    modifiedNumber.splice(pos, 0, Math.floor(Math.random() * 10).toString());
+                } else if (modificationType < 0.7) {
+                    if (modifiedNumber.length > 6) {
+                        const pos = Math.floor(Math.random() * modifiedNumber.length);
+                        modifiedNumber.splice(pos, 1);
+                    } else {
+                        const pos = Math.floor(Math.random() * modifiedNumber.length);
+                        modifiedNumber[pos] = ((parseInt(modifiedNumber[pos]) + 1) % 10).toString();
+                    }
+                } else {
+                    const pos = Math.floor(Math.random() * modifiedNumber.length);
+                    modifiedNumber[pos] = ((parseInt(modifiedNumber[pos]) + 1) % 10).toString();
+                }
+                
+                return { num1: baseNumber, num2: modifiedNumber.join(''), match: false };
+            }
+        }
+
+        function displayNewNumbers() {
+            gameState.currentNumbers = generateSimilarNumbers();
+            document.getElementById('number1').textContent = gameState.currentNumbers.num1;
+            document.getElementById('number2').textContent = gameState.currentNumbers.num2;
+        }
+
+        function startGame() {
+            if (!gameState.isRegistered) {
+                alert('Сначала зарегистрируйтесь!');
+                return;
+            }
+
+            gameState.score = 0;
+            gameState.errors = 0;
+            gameState.timeLeft = 120;
+            
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.game-screen').classList.add('active');
+            
+            updateDisplay();
+            displayNewNumbers();
+            startTimer();
+        }
+
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(userSaysMatch) {
+            const correct = userSaysMatch === gameState.currentNumbers.match;
+            
+            if (correct) {
+                gameState.score++;
+                updateDisplay();
+                displayNewNumbers();
+            } else {
+                gameState.errors++;
+                updateDisplay();
+                showError();
+                
+                if (gameState.errors >= 2) {
+                    endGame();
+                } else {
+                    displayNewNumbers();
+                }
+            }
+        }
+
+        function showError() {
+            const errorAnim = document.getElementById('errorAnim');
+            errorAnim.classList.add('show');
+            
+            setTimeout(() => {
+                errorAnim.classList.remove('show');
+            }, 500);
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('errors').textContent = gameState.errors;
+        }
+
+        async function endGame() {
+            clearInterval(gameState.timerInterval);
+            
+            document.querySelector('.game-screen').classList.remove('active');
+            document.querySelector('.result-screen').classList.add('active');
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            
+            await autoSaveScore();
+            await loadLeaderboard(false);
+        }
+
+        async function autoSaveScore() {
+            const statusContainer = document.getElementById('statusMessageContainer');
+            statusContainer.innerHTML = '';
+
+            try {
+                const response = await fetch(API_SAVE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: gameState.userName,
+                        score: gameState.score,
+                        userId: gameState.userId
+                    })
+                });
+
+                const result = await response.json();
+
+                let message = '';
+                let messageClass = '';
+
+                if (result.status === 'updated') {
+                    message = '🎉 Новый рекорд! Результат автоматически сохранён!';
+                    messageClass = 'status-success';
+                } else if (result.status === 'ignored') {
+                    const currentBest = await getCurrentBestScore();
+                    message = `Ваш предыдущий рекорд лучше: ${currentBest}`;
+                    messageClass = 'status-info';
+                } else if (result.status === 'ok') {
+                    message = '✅ Результат сохранён!';
+                    messageClass = 'status-success';
+                }
+
+                if (message) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `status-message ${messageClass}`;
+                    msgDiv.textContent = message;
+                    statusContainer.appendChild(msgDiv);
+                }
+
+            } catch (error) {
+                console.error('Error saving score:', error);
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'status-message status-info';
+                msgDiv.textContent = 'Ошибка сохранения результата';
+                statusContainer.appendChild(msgDiv);
+            }
+        }
+
+        async function getCurrentBestScore() {
+            try {
+                const response = await fetch(API_LEADERBOARD);
+                const leaderboard = await response.json();
+                const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
+                return myEntry ? myEntry.score : 0;
+            } catch {
+                return 0;
+            }
+        }
+
+        async function loadLeaderboard(isStartScreen) {
+            const containerId = isStartScreen ? 'startLeaderboardContainer' : 'resultLeaderboardContainer';
+            const container = document.getElementById(containerId);
+            
+            try {
+                const response = await fetch(API_LEADERBOARD);
+                const leaderboard = await response.json();
+                
+                if (leaderboard.length === 0) {
+                    container.innerHTML = '<div class="loading">Пока нет результатов</div>';
+                    return;
+                }
+                
+                const medals = ['🥇', '🥈', '🥉'];
+                
+                let html = '<table><thead><tr><th>Место</th><th>Имя</th><th>Результат</th><th>Дата</th></tr></thead><tbody>';
+                
+                leaderboard.forEach((entry, index) => {
+                    const medal = index < 3 ? `<span class="medal">${medals[index]}</span>` : '';
+                    const isCurrentUser = entry.userId === gameState.userId;
+                    const rowClass = isCurrentUser ? 'current-user' : '';
+                    
+                    html += `
+                        <tr class="${rowClass}">
+                            <td>${medal}${index + 1}</td>
+                            <td>${entry.name}${isCurrentUser ? ' (Вы)' : ''}</td>
+                            <td><strong>${entry.score}</strong></td>
+                            <td>${entry.date}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+
+                if (isStartScreen && gameState.isRegistered) {
+                    const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
+                    if (myEntry) {
+                        document.getElementById('bestScore').textContent = myEntry.score;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+                container.innerHTML = '<div class="loading">Ошибка загрузки</div>';
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('statusMessageContainer').innerHTML = '';
+            document.querySelector('.result-screen').classList.remove('active');
+            document.querySelector('.start-screen').classList.add('active');
+        }
+
+        window.onload = async () => {
+            console.log('User ID:', gameState.userId);
+            await loadLeaderboard(true);
+
+            try {
+                const response = await fetch(API_LEADERBOARD);
+                const leaderboard = await response.json();
+                
+                const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
+                
+                if (myEntry) {
+                    gameState.userName = myEntry.name;
+                    gameState.isRegistered = true;
+                    showRegisteredUI();
+                    document.getElementById('bestScore').textContent = myEntry.score;
+                    console.log(`Пользователь уже зарегистрирован: ${myEntry.name}`);
+                } else {
+                    showRegistrationUI();
+                    console.log('Пользователь не зарегистрирован');
+                }
+            } catch (e) {
+                console.error('Ошибка проверки регистрации:', e);
+                showRegistrationUI();
+            }
+        };
+    </script>
+</body>
+</html>
