@@ -369,8 +369,8 @@
 
     <script>
         // API endpoints (Netlify Functions)
-        const API_LEADERBOARD = '/.netlify/functions/leaderboard';
-        const API_SAVE = '/.netlify/functions/save';
+        const API_LEADERBOARD = '/api/leaderboard';
+        const API_SAVE = '/api/save';
 
         let gameState = {
             score: 0,
@@ -640,15 +640,17 @@
             
             try {
                 const response = await fetch(API_LEADERBOARD);
-                const leaderboard = await response.json();
-                
+                const raw = await response.json();
+
+                // Защита: если сервер вернул ошибку вместо массива
+                const leaderboard = Array.isArray(raw) ? raw : [];
+
                 if (leaderboard.length === 0) {
                     container.innerHTML = '<div class="loading">Пока нет результатов</div>';
-                    return;
+                    return [];
                 }
                 
                 const medals = ['🥇', '🥈', '🥉'];
-                
                 let html = '<table><thead><tr><th>Место</th><th>Имя</th><th>Результат</th><th>Дата</th></tr></thead><tbody>';
                 
                 leaderboard.forEach((entry, index) => {
@@ -675,10 +677,13 @@
                         document.getElementById('bestScore').textContent = myEntry.score;
                     }
                 }
+
+                return leaderboard;
                 
             } catch (error) {
                 console.error('Error loading leaderboard:', error);
                 container.innerHTML = '<div class="loading">Ошибка загрузки</div>';
+                return [];
             }
         }
 
@@ -690,26 +695,25 @@
 
         window.onload = async () => {
             console.log('User ID:', gameState.userId);
-            await loadLeaderboard(true);
 
             try {
-                const response = await fetch(API_LEADERBOARD);
-                const leaderboard = await response.json();
+                // loadLeaderboard теперь возвращает массив
+                const leaderboard = await loadLeaderboard(true);
                 
-                const myEntry = leaderboard.find(entry => entry.userId === gameState.userId);
+                const myEntry = (leaderboard || []).find(entry => entry.userId === gameState.userId);
                 
                 if (myEntry) {
                     gameState.userName = myEntry.name;
                     gameState.isRegistered = true;
                     showRegisteredUI();
                     document.getElementById('bestScore').textContent = myEntry.score;
-                    console.log(`Пользователь уже зарегистрирован: ${myEntry.name}`);
+                    console.log('Пользователь уже зарегистрирован:', myEntry.name);
                 } else {
                     showRegistrationUI();
                     console.log('Пользователь не зарегистрирован');
                 }
             } catch (e) {
-                console.error('Ошибка проверки регистрации:', e);
+                console.error('Ошибка загрузки:', e);
                 showRegistrationUI();
             }
         };
