@@ -3,37 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NumMatch — игра на сравнение чисел. Проверьте свою внимательность за 2 минуты!">
     <title>NumMatch — Сравнение чисел</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ── Системные шрифты — никаких внешних запросов ── */
         :root {
-            --bg: #080b14;
-            --surface: #0f1420;
+            --font-ui:   -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Consolas', monospace;
+
+            --bg:       #080b14;
+            --surface:  #0f1420;
             --surface2: #161c2e;
-            --border: #1e2a42;
-            --accent: #4f8eff;
-            --accent2: #7c3aed;
-            --green: #22c55e;
-            --red: #ef4444;
-            --text: #e8edf8;
-            --muted: #4a5578;
-            --gold: #f59e0b;
-            --silver: #94a3b8;
-            --bronze: #b45309;
+            --border:   #1e2a42;
+            --accent:   #4f8eff;
+            --accent2:  #7c3aed;
+            --green:    #22c55e;
+            --red:      #ef4444;
+            --text:     #e8edf8;
+            --muted:    #7a8ab0;   /* поднято с #4a5578 для контраста 4.5:1+ */
+            --gold:     #f59e0b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Animated background grid */
         body::before {
             content: '';
             position: fixed;
@@ -66,7 +66,7 @@
             padding: 24px 16px 60px;
         }
 
-        /* HEADER */
+        /* ── HEADER ── */
         .header {
             display: flex;
             align-items: center;
@@ -80,6 +80,7 @@
             font-size: 1.4rem;
             font-weight: 800;
             letter-spacing: -0.5px;
+            color: var(--text);
         }
 
         .logo span {
@@ -89,20 +90,20 @@
         }
 
         .badge {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
             padding: 4px 10px;
             border: 1px solid var(--border);
             border-radius: 20px;
-            color: var(--muted);
+            color: var(--muted);  /* теперь достаточный контраст */
             letter-spacing: 0.05em;
         }
 
-        /* SCREENS */
+        /* ── SCREENS ── */
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* REGISTRATION CARD */
+        /* ── CARDS ── */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -120,6 +121,7 @@
             margin-bottom: 16px;
         }
 
+        /* ── REGISTRATION ── */
         .reg-row {
             display: flex;
             gap: 10px;
@@ -132,13 +134,13 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 12px 16px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             font-size: 1rem;
             color: var(--text);
             outline: none;
             transition: border-color 0.2s;
+            min-width: 0;
         }
-
         .name-input:focus { border-color: var(--accent); }
         .name-input::placeholder { color: var(--muted); }
 
@@ -147,7 +149,7 @@
             border: none;
             border-radius: 10px;
             padding: 12px 20px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.9rem;
             font-weight: 700;
             color: white;
@@ -155,12 +157,11 @@
             transition: opacity 0.2s, transform 0.15s;
             white-space: nowrap;
         }
-
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-primary:active { transform: translateY(0); }
         .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-        /* WELCOME BLOCK */
+        /* ── WELCOME BLOCK ── */
         .welcome-block {
             background: linear-gradient(135deg, rgba(79,142,255,0.08), rgba(124,58,237,0.08));
             border: 1px solid rgba(79,142,255,0.2);
@@ -172,24 +173,14 @@
             justify-content: space-between;
             gap: 16px;
         }
-
-        .welcome-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
+        .welcome-name { font-size: 1.1rem; font-weight: 700; }
         .welcome-record {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             color: var(--muted);
             margin-top: 4px;
         }
-
-        .record-val {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
+        .record-val { color: var(--accent); font-weight: 700; }
         .avatar {
             width: 48px;
             height: 48px;
@@ -202,29 +193,24 @@
             flex-shrink: 0;
         }
 
-        /* RULES */
+        /* ── RULES ── */
         .rules-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 20px;
+            /* Фиксируем CLS — резервируем высоту заранее */
+            min-height: 200px;
         }
-
-        .rules-grid {
-            display: grid;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
+        .rules-grid { display: grid; gap: 10px; margin-top: 14px; }
         .rule-item {
             display: flex;
             align-items: center;
             gap: 12px;
             font-size: 0.9rem;
-            color: #8a96b8;
+            color: #aab4d0;
         }
-
         .rule-icon {
             width: 28px;
             height: 28px;
@@ -237,46 +223,44 @@
             font-size: 0.85rem;
             flex-shrink: 0;
         }
-
         .rule-item strong { color: var(--text); }
 
-        /* BIG START BUTTON */
+        /* ── START BUTTON ── */
         .btn-start {
             width: 100%;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             border: none;
             border-radius: 14px;
             padding: 18px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             font-size: 1.1rem;
             font-weight: 800;
             color: white;
             cursor: pointer;
-            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            /* box-shadow убран из анимации — заменён filter для GPU-compositing */
+            transition: opacity 0.2s, transform 0.15s;
             letter-spacing: 0.02em;
             margin-bottom: 28px;
-            box-shadow: 0 4px 24px rgba(79,142,255,0.25);
+            filter: drop-shadow(0 4px 16px rgba(79,142,255,0.3));
         }
+        .btn-start:hover { opacity: 0.92; transform: translateY(-2px); }
+        .btn-start:disabled { opacity: 0.25; cursor: not-allowed; transform: none; filter: none; }
 
-        .btn-start:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(79,142,255,0.35); }
-        .btn-start:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* LEADERBOARD */
+        /* ── LEADERBOARD ── */
         .lb-header {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-bottom: 14px;
         }
-
         .lb-title {
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: var(--muted); /* достаточный контраст после поднятия --muted */
+            white-space: nowrap;
         }
-
         .lb-line { flex: 1; height: 1px; background: var(--border); }
 
         .lb-table {
@@ -285,62 +269,57 @@
             border-radius: 16px;
             overflow: hidden;
         }
-
         .lb-row {
             display: grid;
-            grid-template-columns: 40px 1fr auto auto;
+            grid-template-columns: 44px 1fr auto auto;
             align-items: center;
             padding: 14px 20px;
             border-bottom: 1px solid var(--border);
             transition: background 0.15s;
             gap: 12px;
         }
-
         .lb-row:last-child { border-bottom: none; }
         .lb-row:hover { background: var(--surface2); }
         .lb-row.me { background: rgba(79,142,255,0.07); border-left: 2px solid var(--accent); }
 
         .lb-rank {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 0.8rem;
             font-weight: 700;
             text-align: center;
+            color: var(--text);
         }
-
         .lb-name {
             font-size: 0.95rem;
             font-weight: 600;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: var(--text);
         }
-
-        .lb-name .you-tag {
+        .you-tag {
             font-size: 0.65rem;
             font-weight: 700;
-            color: var(--accent);
-            background: rgba(79,142,255,0.12);
+            color: white;               /* белый на синем — хороший контраст */
+            background: var(--accent);
             padding: 2px 7px;
             border-radius: 20px;
             margin-left: 6px;
             vertical-align: middle;
         }
-
         .lb-score {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 1rem;
             font-weight: 700;
             color: var(--accent);
             text-align: right;
         }
-
         .lb-date {
             font-size: 0.7rem;
-            color: var(--muted);
+            color: var(--muted);        /* теперь достаточный контраст */
             text-align: right;
             white-space: nowrap;
         }
-
         .lb-empty {
             padding: 40px 20px;
             text-align: center;
@@ -348,14 +327,13 @@
             font-size: 0.9rem;
         }
 
-        /* ===== GAME SCREEN ===== */
+        /* ── GAME SCREEN ── */
         .game-hud {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
             margin-bottom: 20px;
         }
-
         .hud-item {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -363,7 +341,6 @@
             padding: 12px 16px;
             text-align: center;
         }
-
         .hud-label {
             font-size: 0.6rem;
             font-weight: 700;
@@ -372,18 +349,16 @@
             color: var(--muted);
             margin-bottom: 4px;
         }
-
         .hud-value {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 1.4rem;
             font-weight: 700;
         }
-
-        .hud-value.red { color: var(--red); }
+        .hud-value.red   { color: var(--red); }
         .hud-value.green { color: var(--green); }
-        .hud-value.accent { color: var(--accent); }
+        .hud-value.accent{ color: var(--accent); }
 
-        /* TIMER BAR */
+        /* ── TIMER BAR ── */
         .timer-bar-wrap {
             height: 3px;
             background: var(--border);
@@ -391,19 +366,16 @@
             margin-bottom: 28px;
             overflow: hidden;
         }
-
         .timer-bar {
             height: 100%;
             background: linear-gradient(90deg, var(--green), var(--accent));
             border-radius: 2px;
             transition: width 1s linear, background-color 0.5s;
+            will-change: width;
         }
+        .timer-bar.danger { background: linear-gradient(90deg, var(--red), #f97316); }
 
-        .timer-bar.danger {
-            background: linear-gradient(90deg, var(--red), #f97316);
-        }
-
-        /* NUMBERS DISPLAY - THE KEY FIX */
+        /* ── NUMBERS — ключевой фикс читерства ── */
         .numbers-arena {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -411,48 +383,40 @@
             padding: 28px 20px;
             margin-bottom: 20px;
         }
-
         .numbers-pair {
             display: grid;
-            /* Always side by side, equal width - THIS IS THE CHEAT FIX */
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr;  /* всегда 2 равных столбца */
             gap: 12px;
-            align-items: center;
+            align-items: stretch;
             margin-bottom: 16px;
         }
-
         .num-box {
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px 8px;
             text-align: center;
-            /* Fixed width boxes = can't tell length difference */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
-
         .num-box span {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-weight: 700;
             color: var(--text);
             display: block;
-            /* Scale font to fit — never overflow */
             word-break: break-all;
             line-height: 1.4;
-            /* Responsive font size */
-            font-size: clamp(0.75rem, 2.2vw, 1.15rem);
+            font-size: clamp(0.7rem, 2.2vw, 1.1rem);
         }
-
         .num-divider {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 0;
         }
-
         .divider-line { flex: 1; height: 1px; background: var(--border); }
-
         .divider-text {
             font-size: 0.65rem;
             font-weight: 700;
@@ -461,49 +425,43 @@
             color: var(--muted);
         }
 
-        /* ANSWER BUTTONS */
+        /* ── ANSWER BUTTONS ── */
         .answer-btns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-
         .btn-check, .btn-cross {
             border: none;
             border-radius: 14px;
             padding: 20px 16px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            transition: transform 0.12s, opacity 0.15s, box-shadow 0.15s;
+            transition: transform 0.12s, opacity 0.15s;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.01em;
         }
-
         .btn-check {
             background: rgba(34,197,94,0.12);
             border: 1.5px solid rgba(34,197,94,0.3);
             color: var(--green);
         }
-
         .btn-cross {
             background: rgba(239,68,68,0.12);
             border: 1.5px solid rgba(239,68,68,0.3);
             color: var(--red);
         }
-
-        .btn-check:hover { background: rgba(34,197,94,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
-        .btn-cross:hover { background: rgba(239,68,68,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(239,68,68,0.15); }
+        .btn-check:hover { background: rgba(34,197,94,0.22); transform: translateY(-2px); }
+        .btn-cross:hover { background: rgba(239,68,68,0.22); transform: translateY(-2px); }
         .btn-check:active, .btn-cross:active { transform: scale(0.96); }
+        .btn-icon  { font-size: 2rem; line-height: 1; }
+        .btn-label { font-size: 0.75rem; opacity: 0.8; }
 
-        .btn-icon { font-size: 2rem; line-height: 1; }
-        .btn-label { font-size: 0.75rem; opacity: 0.7; }
-
-        /* ERROR FLASH */
+        /* ── ERROR FLASH ── */
         .error-flash {
             position: fixed;
             inset: 0;
@@ -513,7 +471,6 @@
             z-index: 999;
             pointer-events: none;
         }
-
         .error-pill {
             background: var(--red);
             color: white;
@@ -524,20 +481,14 @@
             opacity: 0;
             transform: scale(0.7) translateY(-20px);
             transition: opacity 0.15s, transform 0.15s;
-            box-shadow: 0 8px 32px rgba(239,68,68,0.4);
         }
+        .error-pill.show { opacity: 1; transform: scale(1) translateY(0); }
 
-        .error-pill.show {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
-        /* RESULT SCREEN */
+        /* ── RESULT SCREEN ── */
         .result-hero {
             text-align: center;
             padding: 40px 20px 28px;
         }
-
         .result-label {
             font-size: 0.7rem;
             font-weight: 700;
@@ -546,21 +497,14 @@
             color: var(--muted);
             margin-bottom: 12px;
         }
-
         .result-number {
-            font-family: 'Space Mono', monospace;
+            font-family: var(--font-mono);
             font-size: 5rem;
             font-weight: 700;
             line-height: 1;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .result-sub {
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-top: 8px;
         }
 
         .status-banner {
@@ -571,14 +515,12 @@
             font-size: 0.9rem;
             margin-bottom: 20px;
         }
-
-        .status-banner.success {
+        .status-success {
             background: rgba(34,197,94,0.1);
             border: 1px solid rgba(34,197,94,0.25);
-            color: var(--green);
+            color: #4ade80;
         }
-
-        .status-banner.info {
+        .status-info {
             background: rgba(245,158,11,0.1);
             border: 1px solid rgba(245,158,11,0.25);
             color: var(--gold);
@@ -590,7 +532,7 @@
             border: 1.5px solid var(--border);
             border-radius: 14px;
             padding: 16px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-ui);
             font-size: 1rem;
             font-weight: 700;
             color: var(--text);
@@ -598,19 +540,14 @@
             transition: border-color 0.2s, background 0.2s;
             margin-top: 20px;
         }
-
         .btn-restart:hover { border-color: var(--accent); background: rgba(79,142,255,0.06); }
 
-        /* Pulse animation for correct answer */
+        /* ── ANIMATIONS ── */
         @keyframes correctPulse {
-            0% { border-color: var(--border); }
-            50% { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
-            100% { border-color: var(--border); }
+            0%, 100% { border-color: var(--border); }
+            50% { border-color: var(--green); }
         }
-
-        .num-box.correct-flash {
-            animation: correctPulse 0.3s ease;
-        }
+        .num-box.correct-flash { animation: correctPulse 0.3s ease; }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -619,29 +556,15 @@
             60% { transform: translateX(-4px); }
             80% { transform: translateX(4px); }
         }
+        .numbers-arena.shake { animation: shake 0.35s ease; }
 
-        .numbers-arena.shake {
-            animation: shake 0.35s ease;
-        }
-
-        /* Loading dots */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 32px;
-            color: var(--muted);
-            font-size: 0.85rem;
-        }
-
+        /* ── MOBILE ── */
         @media (max-width: 480px) {
-            .header { margin-bottom: 20px; }
             .result-number { font-size: 4rem; }
             .game-hud { gap: 8px; }
             .hud-value { font-size: 1.2rem; }
             .btn-check, .btn-cross { padding: 16px 12px; }
-            .num-box span { font-size: clamp(0.65rem, 3.5vw, 0.95rem); }
+            .num-box span { font-size: clamp(0.62rem, 3.5vw, 0.9rem); }
         }
     </style>
 </head>
@@ -650,121 +573,125 @@
 
     <header class="header">
         <div class="logo">Num<span>Match</span></div>
-        <div class="badge">v2.0</div>
+        <div class="badge">v2.1</div>
     </header>
 
-    <!-- ===== START SCREEN ===== -->
-    <div class="screen active" id="screenStart">
+    <main>
+        <!-- ===== START SCREEN ===== -->
+        <div class="screen active" id="screenStart">
 
-        <!-- Registration (new user) -->
-        <div id="regBlock" class="card" style="display:none">
-            <div class="card-label">👤 Регистрация</div>
-            <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">Введите имя — оно будет зафиксировано навсегда</p>
-            <div class="reg-row">
-                <input class="name-input" id="regInput" type="text" placeholder="Ваш ник" maxlength="20"
-                    onkeydown="if(event.key==='Enter') registerName()">
-                <button class="btn-primary" onclick="registerName()">Войти →</button>
+            <div id="regBlock" class="card" style="display:none">
+                <div class="card-label">👤 Регистрация</div>
+                <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">Введите имя — оно зафиксируется навсегда</p>
+                <div class="reg-row">
+                    <input class="name-input" id="regInput" type="text"
+                        placeholder="Ваш ник" maxlength="20"
+                        aria-label="Введите ваш ник"
+                        onkeydown="if(event.key==='Enter') registerName()">
+                    <button class="btn-primary" onclick="registerName()">Войти →</button>
+                </div>
+            </div>
+
+            <div id="welcomeBlock" class="welcome-block" style="display:none">
+                <div>
+                    <div class="welcome-name" id="welcomeName">—</div>
+                    <div class="welcome-record">Лучший результат: <span class="record-val" id="welcomeRecord">0</span></div>
+                </div>
+                <div class="avatar" aria-hidden="true">🎯</div>
+            </div>
+
+            <div class="rules-card">
+                <div class="card-label">📋 Правила</div>
+                <div class="rules-grid">
+                    <div class="rule-item"><div class="rule-icon" aria-hidden="true">⏱</div><span><strong>2 минуты</strong> на сессию</span></div>
+                    <div class="rule-item"><div class="rule-icon" aria-hidden="true">✓</div><span>Числа <strong>одинаковые</strong> → жми галочку</span></div>
+                    <div class="rule-item"><div class="rule-icon" aria-hidden="true">✗</div><span>Числа <strong>разные</strong> → жми крестик</span></div>
+                    <div class="rule-item"><div class="rule-icon" aria-hidden="true">❌</div><span>Максимум <strong>2 ошибки</strong></span></div>
+                </div>
+            </div>
+
+            <button class="btn-start" id="btnStart" onclick="startGame()" disabled
+                aria-label="Начать игру">Начать игру</button>
+
+            <div class="lb-header">
+                <div class="lb-title">Таблица лидеров</div>
+                <div class="lb-line"></div>
+            </div>
+            <div class="lb-table" id="lbStart" role="region" aria-label="Таблица лидеров">
+                <div class="lb-empty">Загрузка…</div>
             </div>
         </div>
 
-        <!-- Welcome (returning user) -->
-        <div id="welcomeBlock" class="welcome-block" style="display:none">
-            <div>
-                <div class="welcome-name" id="welcomeName">—</div>
-                <div class="welcome-record">Лучший результат: <span class="record-val" id="welcomeRecord">0</span></div>
+        <!-- ===== GAME SCREEN ===== -->
+        <div class="screen" id="screenGame">
+            <div class="game-hud" role="status" aria-live="polite">
+                <div class="hud-item">
+                    <div class="hud-label">Время</div>
+                    <div class="hud-value accent" id="hudTimer">120</div>
+                </div>
+                <div class="hud-item">
+                    <div class="hud-label">Правильно</div>
+                    <div class="hud-value green" id="hudScore">0</div>
+                </div>
+                <div class="hud-item">
+                    <div class="hud-label">Ошибки</div>
+                    <div class="hud-value red" id="hudErrors">0/2</div>
+                </div>
             </div>
-            <div class="avatar">🎯</div>
-        </div>
 
-        <!-- Rules -->
-        <div class="rules-card">
-            <div class="card-label">📋 Правила</div>
-            <div class="rules-grid">
-                <div class="rule-item"><div class="rule-icon">⏱</div><span><strong>2 минуты</strong> на сессию</span></div>
-                <div class="rule-item"><div class="rule-icon">✓</div><span>Числа <strong>одинаковые</strong> → жми галочку</span></div>
-                <div class="rule-item"><div class="rule-icon">✗</div><span>Числа <strong>разные</strong> → жми крестик</span></div>
-                <div class="rule-item"><div class="rule-icon">❌</div><span>Максимум <strong>2 ошибки</strong></span></div>
+            <div class="timer-bar-wrap" role="progressbar" aria-label="Оставшееся время">
+                <div class="timer-bar" id="timerBar"></div>
             </div>
-        </div>
 
-        <button class="btn-start" id="btnStart" onclick="startGame()" disabled>Начать игру</button>
-
-        <div class="lb-header">
-            <div class="lb-title">Таблица лидеров</div>
-            <div class="lb-line"></div>
-        </div>
-        <div class="lb-table" id="lbStart"><div class="loading">Загрузка...</div></div>
-    </div>
-
-    <!-- ===== GAME SCREEN ===== -->
-    <div class="screen" id="screenGame">
-        <div class="game-hud">
-            <div class="hud-item">
-                <div class="hud-label">Время</div>
-                <div class="hud-value accent" id="hudTimer">120</div>
+            <div class="numbers-arena" id="arena">
+                <div class="numbers-pair">
+                    <div class="num-box" id="numBoxA"><span id="numA">—</span></div>
+                    <div class="num-box" id="numBoxB"><span id="numB">—</span></div>
+                </div>
+                <div class="num-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">совпадают?</div>
+                    <div class="divider-line"></div>
+                </div>
             </div>
-            <div class="hud-item">
-                <div class="hud-label">Правильно</div>
-                <div class="hud-value green" id="hudScore">0</div>
-            </div>
-            <div class="hud-item">
-                <div class="hud-label">Ошибки</div>
-                <div class="hud-value red" id="hudErrors">0/2</div>
-            </div>
-        </div>
 
-        <div class="timer-bar-wrap">
-            <div class="timer-bar" id="timerBar"></div>
-        </div>
-
-        <div class="numbers-arena" id="arena">
-            <div class="numbers-pair">
-                <div class="num-box" id="numBoxA"><span id="numA">—</span></div>
-                <div class="num-box" id="numBoxB"><span id="numB">—</span></div>
-            </div>
-            <div class="num-divider">
-                <div class="divider-line"></div>
-                <div class="divider-text">совпадают?</div>
-                <div class="divider-line"></div>
+            <div class="answer-btns">
+                <button class="btn-check" onclick="answer(true)" aria-label="Числа одинаковые">
+                    <div class="btn-icon" aria-hidden="true">✓</div>
+                    <div class="btn-label">Одинаковые</div>
+                </button>
+                <button class="btn-cross" onclick="answer(false)" aria-label="Числа разные">
+                    <div class="btn-icon" aria-hidden="true">✗</div>
+                    <div class="btn-label">Разные</div>
+                </button>
             </div>
         </div>
 
-        <div class="answer-btns">
-            <button class="btn-check" onclick="answer(true)">
-                <div class="btn-icon">✓</div>
-                <div class="btn-label">Одинаковые</div>
-            </button>
-            <button class="btn-cross" onclick="answer(false)">
-                <div class="btn-icon">✗</div>
-                <div class="btn-label">Разные</div>
-            </button>
+        <!-- ===== RESULT SCREEN ===== -->
+        <div class="screen" id="screenResult">
+            <div class="result-hero">
+                <div class="result-label">Ваш результат</div>
+                <div class="result-number" id="resultNum">0</div>
+            </div>
+
+            <div id="statusBanner"></div>
+
+            <div class="lb-header">
+                <div class="lb-title">Таблица лидеров</div>
+                <div class="lb-line"></div>
+            </div>
+            <div class="lb-table" id="lbResult" role="region" aria-label="Таблица лидеров">
+                <div class="lb-empty">Загрузка…</div>
+            </div>
+
+            <button class="btn-restart" onclick="restartGame()">↩ Играть снова</button>
         </div>
-    </div>
-
-    <!-- ===== RESULT SCREEN ===== -->
-    <div class="screen" id="screenResult">
-        <div class="result-hero">
-            <div class="result-label">Ваш результат</div>
-            <div class="result-number" id="resultNum">0</div>
-            <div class="result-sub" id="resultSub">правильных ответов</div>
-        </div>
-
-        <div id="statusBanner"></div>
-
-        <div class="lb-header">
-            <div class="lb-title">Таблица лидеров</div>
-            <div class="lb-line"></div>
-        </div>
-        <div class="lb-table" id="lbResult"><div class="loading">Загрузка...</div></div>
-
-        <button class="btn-restart" onclick="restartGame()">↩ Играть снова</button>
-    </div>
+    </main>
 
 </div>
 
-<!-- Error flash overlay -->
-<div class="error-flash" id="errFlash">
-    <div class="error-pill" id="errPill">❌ Ошибка!</div>
+<div class="error-flash" aria-live="assertive" aria-atomic="true">
+    <div class="error-pill" id="errPill" role="alert">❌ Ошибка!</div>
 </div>
 
 <script>
@@ -777,7 +704,6 @@
         userId: null, userName: null, registered: false
     };
 
-    // UserId via localStorage
     function getUserId() {
         let id = localStorage.getItem('nm_uid');
         if (!id) {
@@ -788,9 +714,9 @@
     }
     gs.userId = getUserId();
 
-    // ─── Number Generation ───────────────────────────────────────
+    // ── Number Generation ──────────────────────────────────────────
     function genNumbers() {
-        const len = Math.floor(Math.random() * 10) + 6; // 6-15
+        const len = Math.floor(Math.random() * 10) + 6;
         let base = '';
         for (let i = 0; i < len; i++) base += Math.floor(Math.random() * 10);
 
@@ -799,14 +725,11 @@
         let mod = base.split('');
         const t = Math.random();
         if (t < 0.4) {
-            // Insert digit
-            const pos = Math.floor(Math.random() * mod.length);
-            mod.splice(pos, 0, String(Math.floor(Math.random() * 10)));
+            mod.splice(Math.floor(Math.random() * mod.length), 0,
+                String(Math.floor(Math.random() * 10)));
         } else if (t < 0.7 && mod.length > 6) {
-            // Delete digit
             mod.splice(Math.floor(Math.random() * mod.length), 1);
         } else {
-            // Change digit
             const pos = Math.floor(Math.random() * mod.length);
             mod[pos] = String((parseInt(mod[pos]) + 1 + Math.floor(Math.random() * 8)) % 10);
         }
@@ -819,7 +742,7 @@
         document.getElementById('numB').textContent = gs.cur.b;
     }
 
-    // ─── Game Logic ───────────────────────────────────────────────
+    // ── Game Logic ─────────────────────────────────────────────────
     function startGame() {
         if (!gs.registered) return;
         gs.score = 0; gs.errors = 0; gs.timeLeft = 120;
@@ -848,7 +771,6 @@
     function answer(userSaysMatch) {
         if (userSaysMatch === gs.cur.match) {
             gs.score++;
-            // Subtle correct flash
             ['numBoxA','numBoxB'].forEach(id => {
                 const el = document.getElementById(id);
                 el.classList.add('correct-flash');
@@ -859,10 +781,8 @@
         } else {
             gs.errors++;
             updateHUD();
-            // Shake + error overlay
-            const arena = document.getElementById('arena');
-            arena.classList.add('shake');
-            setTimeout(() => arena.classList.remove('shake'), 400);
+            document.getElementById('arena').classList.add('shake');
+            setTimeout(() => document.getElementById('arena').classList.remove('shake'), 400);
             showError();
             if (gs.errors >= 2) { setTimeout(endGame, 400); return; }
             showNumbers();
@@ -879,10 +799,8 @@
         clearInterval(gs.interval);
         document.getElementById('resultNum').textContent = gs.score;
         showScreen('screenResult');
-        document.getElementById('lbResult').innerHTML = '<div class="loading">Загрузка...</div>';
+        document.getElementById('lbResult').innerHTML = '<div class="lb-empty">Сохранение…</div>';
         document.getElementById('statusBanner').innerHTML = '';
-
-        // Auto-save
         await autoSave();
         await renderLB('lbResult');
     }
@@ -897,16 +815,14 @@
             const res = await r.json();
             const banner = document.getElementById('statusBanner');
             if (res.status === 'updated') {
-                banner.innerHTML = '<div class="status-banner success">🎉 Новый рекорд! Результат сохранён!</div>';
+                banner.innerHTML = '<div class="status-banner status-success">🎉 Новый рекорд! Результат сохранён!</div>';
             } else if (res.status === 'ignored') {
                 const best = await getBestScore();
-                banner.innerHTML = `<div class="status-banner info">Ваш рекорд: ${best} — не побит</div>`;
+                banner.innerHTML = `<div class="status-banner status-info">Ваш рекорд: ${best} — не побит</div>`;
             } else if (res.status === 'ok') {
-                banner.innerHTML = '<div class="status-banner success">✓ Результат сохранён</div>';
+                banner.innerHTML = '<div class="status-banner status-success">✓ Результат сохранён</div>';
             }
-        } catch(e) {
-            console.error('Save error:', e);
-        }
+        } catch(e) { console.error('Save error:', e); }
     }
 
     async function getBestScore() {
@@ -919,16 +835,13 @@
 
     function restartGame() {
         showScreen('screenStart');
-        renderLB('lbStart');
-        if (gs.registered) {
-            // Update best score display
-            getBestScore().then(s => {
-                document.getElementById('welcomeRecord').textContent = s;
-            });
-        }
+        renderLB('lbStart').then(lb => {
+            const me = lb.find(e => e.userId === gs.userId);
+            if (me) document.getElementById('welcomeRecord').textContent = me.score;
+        });
     }
 
-    // ─── Leaderboard ──────────────────────────────────────────────
+    // ── Leaderboard ────────────────────────────────────────────────
     async function renderLB(containerId) {
         const el = document.getElementById(containerId);
         try {
@@ -952,12 +865,10 @@
                 </div>`;
             }).join('');
 
-            // Update welcome record if on start screen
             if (containerId === 'lbStart' && gs.registered) {
                 const me = lb.find(e => e.userId === gs.userId);
                 if (me) document.getElementById('welcomeRecord').textContent = me.score;
             }
-
             return lb;
         } catch(err) {
             el.innerHTML = '<div class="lb-empty">Ошибка загрузки</div>';
@@ -965,18 +876,18 @@
         }
     }
 
-    // ─── Registration ─────────────────────────────────────────────
+    // ── Registration ───────────────────────────────────────────────
     async function registerName() {
         const input = document.getElementById('regInput');
-        const name = input.value.trim();
+        const name  = input.value.trim();
         if (!name) { input.focus(); return; }
 
         const btn = input.nextElementSibling;
         btn.disabled = true;
-        btn.textContent = '...';
+        btn.textContent = '…';
 
         try {
-            const r = await fetch(API_SAVE, {
+            const r   = await fetch(API_SAVE, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, score: 0, userId: gs.userId })
@@ -1013,18 +924,16 @@
         btn.disabled = false;
     }
 
-    // ─── Screen Management ────────────────────────────────────────
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ─── Init ─────────────────────────────────────────────────────
+    // ── Init ───────────────────────────────────────────────────────
     window.onload = async () => {
         const lb = await renderLB('lbStart');
         const me = lb.find(e => e.userId === gs.userId);
-
         if (me) {
             gs.userName = me.name;
             gs.registered = true;
