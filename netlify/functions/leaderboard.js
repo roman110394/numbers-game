@@ -5,22 +5,26 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        // Кэшируем на CDN-edge 60 сек, в браузере не кэшируем
+        // Это значит: первый запрос за 60 сек идёт к функции,
+        // все остальные — отдаются с CDN мгновенно
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
     };
 
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 200, headers, body: '' };
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+    const supabaseUrl = (process.env.SUPABASE_URL || '').trim().replace(/\/$/, '');
+    const supabaseKey = (process.env.SUPABASE_SERVICE_KEY || '').trim();
 
     if (!supabaseUrl || !supabaseKey) {
         console.error('Missing env vars:', { hasUrl: !!supabaseUrl, hasKey: !!supabaseKey });
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_KEY', data: [] })
+            body: JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_KEY' })
         };
     }
 
@@ -34,11 +38,11 @@ exports.handler = async (event, context) => {
             .limit(10);
 
         if (error) {
-            console.error('Supabase error:', error);
+            console.error('Supabase query error:', JSON.stringify(error));
             return {
                 statusCode: 500,
                 headers,
-                body: JSON.stringify({ error: error.message, data: [] })
+                body: JSON.stringify({ error: error.message })
             };
         }
 
@@ -56,11 +60,11 @@ exports.handler = async (event, context) => {
         };
 
     } catch (err) {
-        console.error('Unexpected error:', err);
+        console.error('Exception:', err.message);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: err.message, data: [] })
+            body: JSON.stringify({ error: err.message })
         };
     }
 };
