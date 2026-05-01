@@ -504,16 +504,18 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            min-height: 56px;
             transition: background 0.25s, border-color 0.3s;
         }
         .num-box span {
             font-family: var(--font-mono);
             font-weight: 700;
             color: var(--text);
-            display: block;
-            word-break: break-all;
-            line-height: 1.4;
-            font-size: clamp(0.7rem, 2.2vw, 1.1rem);
+            display: inline-block;
+            white-space: nowrap;
+            line-height: 1.2;
+            /* font-size устанавливается через JS функцией fitNumbers() */
+            font-size: 18px;
         }
         .num-divider {
             display: flex;
@@ -669,7 +671,7 @@
             .game-hud { gap: 8px; }
             .hud-value { font-size: 1.2rem; }
             .btn-check, .btn-cross { padding: 16px 12px; }
-            .num-box span { font-size: clamp(0.62rem, 3.5vw, 0.9rem); }
+            /* размер шрифта чисел подбирается JS-функцией fitNumbers() */
         }
     </style>
 </head>
@@ -882,7 +884,43 @@
         gs.cur = genNumbers();
         document.getElementById('numA').textContent = gs.cur.a;
         document.getElementById('numB').textContent = gs.cur.b;
+        fitNumbers();
     }
+
+    // Подбирает размер шрифта так, чтобы оба числа влезли в свои блоки
+    // в одну строку. Применяет ОДИНАКОВЫЙ размер к обоим — чтобы нельзя
+    // было визуально определить какое число длиннее.
+    function fitNumbers() {
+        const spanA = document.getElementById('numA');
+        const spanB = document.getElementById('numB');
+        const boxA  = document.getElementById('numBoxA');
+        const boxB  = document.getElementById('numBoxB');
+        if (!spanA.textContent || spanA.textContent === '—') return;
+
+        // Доступная ширина = ширина блока минус padding (16+8+8=32, берём с запасом)
+        const availA = boxA.clientWidth - 18;
+        const availB = boxB.clientWidth - 18;
+        const avail  = Math.min(availA, availB);
+        if (avail <= 0) return;
+
+        // Подбираем размер: от 22px вниз пока не влезет в одну строку
+        let size = 22;
+        spanA.style.fontSize = size + 'px';
+        spanB.style.fontSize = size + 'px';
+
+        while (size > 8 && (spanA.scrollWidth > avail || spanB.scrollWidth > avail)) {
+            size--;
+            spanA.style.fontSize = size + 'px';
+            spanB.style.fontSize = size + 'px';
+        }
+    }
+
+    // Пересчитываем размер при изменении ширины окна (поворот, ресайз)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(fitNumbers, 100);
+    });
 
     function startGame() {
         if (!gs.registered) return;
