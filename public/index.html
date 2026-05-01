@@ -1,30 +1,91 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="NumMatch — игра на сравнение чисел. Проверьте свою внимательность за 2 минуты!">
+    <meta name="theme-color" content="#080b14" id="metaThemeColor">
     <title>NumMatch — Сравнение чисел</title>
+
+    <!-- Применяем тему ДО рендера, чтобы не было вспышки -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('nm_theme');
+            var theme;
+            if (saved === 'light' || saved === 'dark') {
+                theme = saved;
+            } else {
+                theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <style>
-        /* ── Системные шрифты — никаких внешних запросов ── */
+        /* ── Шрифты системные ── */
         :root {
             --font-ui:   -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Consolas', monospace;
+        }
 
-            --bg:       #080b14;
-            --surface:  #0f1420;
-            --surface2: #161c2e;
-            --border:   #1e2a42;
-            --accent:   #4f8eff;
-            --accent2:  #7c3aed;
-            --green:    #22c55e;
-            --red:      #ef4444;
-            --text:     #e8edf8;
-            --muted:    #7a8ab0;   /* поднято с #4a5578 для контраста 4.5:1+ */
-            --gold:     #f59e0b;
+        /* ── ТЁМНАЯ ТЕМА (по умолчанию) ── */
+        [data-theme="dark"] {
+            --bg:        #080b14;
+            --bg-grid:   rgba(79,142,255,0.03);
+            --bg-glow:   rgba(79,142,255,0.06);
+            --surface:   #0f1420;
+            --surface2:  #161c2e;
+            --border:    #1e2a42;
+            --text:      #e8edf8;
+            --muted:     #7a8ab0;
+            --soft:      #aab4d0;
+            --accent:    #4f8eff;
+            --accent2:   #7c3aed;
+            --green:     #22c55e;
+            --green-bg:  rgba(34,197,94,0.12);
+            --green-bg2: rgba(34,197,94,0.22);
+            --green-br:  rgba(34,197,94,0.3);
+            --red:       #ef4444;
+            --red-bg:    rgba(239,68,68,0.12);
+            --red-bg2:   rgba(239,68,68,0.22);
+            --red-br:    rgba(239,68,68,0.3);
+            --gold:      #f59e0b;
+            --me-bg:     rgba(79,142,255,0.07);
+            --hero-grad: linear-gradient(135deg, rgba(79,142,255,0.08), rgba(124,58,237,0.08));
+            --hero-br:   rgba(79,142,255,0.2);
+        }
+
+        /* ── СВЕТЛАЯ ТЕМА ── */
+        [data-theme="light"] {
+            --bg:        #f8fafc;
+            --bg-grid:   rgba(79,142,255,0.05);
+            --bg-glow:   rgba(124,58,237,0.05);
+            --surface:   #ffffff;
+            --surface2:  #f1f5f9;
+            --border:    #e2e8f0;
+            --text:      #0f172a;
+            --muted:     #64748b;
+            --soft:      #475569;
+            --accent:    #4f46e5;       /* indigo-600 для лучшего контраста */
+            --accent2:   #7c3aed;
+            --green:     #15803d;
+            --green-bg:  rgba(34,197,94,0.1);
+            --green-bg2: rgba(34,197,94,0.2);
+            --green-br:  rgba(34,197,94,0.4);
+            --red:       #b91c1c;
+            --red-bg:    rgba(239,68,68,0.08);
+            --red-bg2:   rgba(239,68,68,0.18);
+            --red-br:    rgba(239,68,68,0.4);
+            --gold:      #b45309;
+            --me-bg:     rgba(79,70,229,0.08);
+            --hero-grad: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(124,58,237,0.06));
+            --hero-br:   rgba(79,70,229,0.25);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { color-scheme: dark; }
+        [data-theme="light"] { color-scheme: light; }
 
         body {
             font-family: var(--font-ui);
@@ -32,6 +93,7 @@
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.25s ease;
         }
 
         body::before {
@@ -39,8 +101,8 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(79,142,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(79,142,255,0.03) 1px, transparent 1px);
+                linear-gradient(var(--bg-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
@@ -53,7 +115,7 @@
             left: -20%;
             width: 70%;
             height: 70%;
-            background: radial-gradient(ellipse, rgba(79,142,255,0.06) 0%, transparent 70%);
+            background: radial-gradient(ellipse, var(--bg-glow) 0%, transparent 70%);
             pointer-events: none;
             z-index: 0;
         }
@@ -74,6 +136,7 @@
             margin-bottom: 32px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
+            gap: 12px;
         }
 
         .logo {
@@ -82,11 +145,17 @@
             letter-spacing: -0.5px;
             color: var(--text);
         }
-
         .logo span {
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .badge {
@@ -95,9 +164,40 @@
             padding: 4px 10px;
             border: 1px solid var(--border);
             border-radius: 20px;
-            color: var(--muted);  /* теперь достаточный контраст */
+            color: var(--muted);
             letter-spacing: 0.05em;
         }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text);
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: transform 0.4s ease, opacity 0.25s ease;
+        }
+        [data-theme="dark"] .icon-sun  { transform: translateY(28px) rotate(90deg); opacity: 0; }
+        [data-theme="dark"] .icon-moon { transform: translateY(0) rotate(0); opacity: 1; }
+        [data-theme="light"] .icon-sun  { transform: translateY(0) rotate(0); opacity: 1; }
+        [data-theme="light"] .icon-moon { transform: translateY(-28px) rotate(-90deg); opacity: 0; }
 
         /* ── SCREENS ── */
         .screen { display: none; }
@@ -110,6 +210,7 @@
             border-radius: 16px;
             padding: 28px;
             margin-bottom: 20px;
+            transition: background 0.25s, border-color 0.25s;
         }
 
         .card-label {
@@ -122,11 +223,7 @@
         }
 
         /* ── REGISTRATION ── */
-        .reg-row {
-            display: flex;
-            gap: 10px;
-            align-items: stretch;
-        }
+        .reg-row { display: flex; gap: 10px; align-items: stretch; }
 
         .name-input {
             flex: 1;
@@ -138,7 +235,7 @@
             font-size: 1rem;
             color: var(--text);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.25s;
             min-width: 0;
         }
         .name-input:focus { border-color: var(--accent); }
@@ -158,13 +255,12 @@
             white-space: nowrap;
         }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* ── WELCOME BLOCK ── */
         .welcome-block {
-            background: linear-gradient(135deg, rgba(79,142,255,0.08), rgba(124,58,237,0.08));
-            border: 1px solid rgba(79,142,255,0.2);
+            background: var(--hero-grad);
+            border: 1px solid var(--hero-br);
             border-radius: 16px;
             padding: 20px 28px;
             margin-bottom: 20px;
@@ -172,8 +268,9 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
+            transition: background 0.25s, border-color 0.25s;
         }
-        .welcome-name { font-size: 1.1rem; font-weight: 700; }
+        .welcome-name { font-size: 1.1rem; font-weight: 700; color: var(--text); }
         .welcome-record {
             font-family: var(--font-mono);
             font-size: 0.8rem;
@@ -200,8 +297,8 @@
             border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 20px;
-            /* Фиксируем CLS — резервируем высоту заранее */
             min-height: 200px;
+            transition: background 0.25s, border-color 0.25s;
         }
         .rules-grid { display: grid; gap: 10px; margin-top: 14px; }
         .rule-item {
@@ -209,7 +306,7 @@
             align-items: center;
             gap: 12px;
             font-size: 0.9rem;
-            color: #aab4d0;
+            color: var(--soft);
         }
         .rule-icon {
             width: 28px;
@@ -237,14 +334,13 @@
             font-weight: 800;
             color: white;
             cursor: pointer;
-            /* box-shadow убран из анимации — заменён filter для GPU-compositing */
             transition: opacity 0.2s, transform 0.15s;
             letter-spacing: 0.02em;
             margin-bottom: 28px;
-            filter: drop-shadow(0 4px 16px rgba(79,142,255,0.3));
+            filter: drop-shadow(0 4px 16px rgba(79,70,229,0.3));
         }
         .btn-start:hover { opacity: 0.92; transform: translateY(-2px); }
-        .btn-start:disabled { opacity: 0.25; cursor: not-allowed; transform: none; filter: none; }
+        .btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none; filter: none; }
 
         /* ── LEADERBOARD ── */
         .lb-header {
@@ -258,7 +354,7 @@
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--muted); /* достаточный контраст после поднятия --muted */
+            color: var(--muted);
             white-space: nowrap;
         }
         .lb-line { flex: 1; height: 1px; background: var(--border); }
@@ -268,6 +364,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
+            transition: background 0.25s, border-color 0.25s;
         }
         .lb-row {
             display: grid;
@@ -280,7 +377,10 @@
         }
         .lb-row:last-child { border-bottom: none; }
         .lb-row:hover { background: var(--surface2); }
-        .lb-row.me { background: rgba(79,142,255,0.07); border-left: 2px solid var(--accent); }
+        .lb-row.me {
+            background: var(--me-bg);
+            border-left: 2px solid var(--accent);
+        }
 
         .lb-rank {
             font-family: var(--font-mono);
@@ -300,7 +400,7 @@
         .you-tag {
             font-size: 0.65rem;
             font-weight: 700;
-            color: white;               /* белый на синем — хороший контраст */
+            color: white;
             background: var(--accent);
             padding: 2px 7px;
             border-radius: 20px;
@@ -316,7 +416,7 @@
         }
         .lb-date {
             font-size: 0.7rem;
-            color: var(--muted);        /* теперь достаточный контраст */
+            color: var(--muted);
             text-align: right;
             white-space: nowrap;
         }
@@ -327,7 +427,7 @@
             font-size: 0.9rem;
         }
 
-        /* ── GAME SCREEN ── */
+        /* ── GAME HUD ── */
         .game-hud {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -340,6 +440,7 @@
             border-radius: 12px;
             padding: 12px 16px;
             text-align: center;
+            transition: background 0.25s, border-color 0.25s;
         }
         .hud-label {
             font-size: 0.6rem;
@@ -370,22 +471,25 @@
             height: 100%;
             background: linear-gradient(90deg, var(--green), var(--accent));
             border-radius: 2px;
-            transition: width 1s linear, background-color 0.5s;
+            transition: width 1s linear;
             will-change: width;
         }
-        .timer-bar.danger { background: linear-gradient(90deg, var(--red), #f97316); }
+        .timer-bar.danger {
+            background: linear-gradient(90deg, var(--red), #f97316);
+        }
 
-        /* ── NUMBERS — ключевой фикс читерства ── */
+        /* ── NUMBERS ARENA ── */
         .numbers-arena {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 28px 20px;
             margin-bottom: 20px;
+            transition: background 0.25s, border-color 0.25s;
         }
         .numbers-pair {
             display: grid;
-            grid-template-columns: 1fr 1fr;  /* всегда 2 равных столбца */
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             align-items: stretch;
             margin-bottom: 16px;
@@ -400,6 +504,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            transition: background 0.25s, border-color 0.3s;
         }
         .num-box span {
             font-family: var(--font-mono);
@@ -439,27 +544,27 @@
             font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            transition: transform 0.12s, opacity 0.15s;
+            transition: transform 0.12s, opacity 0.15s, background 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
         }
         .btn-check {
-            background: rgba(34,197,94,0.12);
-            border: 1.5px solid rgba(34,197,94,0.3);
+            background: var(--green-bg);
+            border: 1.5px solid var(--green-br);
             color: var(--green);
         }
         .btn-cross {
-            background: rgba(239,68,68,0.12);
-            border: 1.5px solid rgba(239,68,68,0.3);
+            background: var(--red-bg);
+            border: 1.5px solid var(--red-br);
             color: var(--red);
         }
-        .btn-check:hover { background: rgba(34,197,94,0.22); transform: translateY(-2px); }
-        .btn-cross:hover { background: rgba(239,68,68,0.22); transform: translateY(-2px); }
+        .btn-check:hover { background: var(--green-bg2); transform: translateY(-2px); }
+        .btn-cross:hover { background: var(--red-bg2); transform: translateY(-2px); }
         .btn-check:active, .btn-cross:active { transform: scale(0.96); }
         .btn-icon  { font-size: 2rem; line-height: 1; }
-        .btn-label { font-size: 0.75rem; opacity: 0.8; }
+        .btn-label { font-size: 0.75rem; opacity: 0.85; }
 
         /* ── ERROR FLASH ── */
         .error-flash {
@@ -505,6 +610,7 @@
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .status-banner {
@@ -516,13 +622,13 @@
             margin-bottom: 20px;
         }
         .status-success {
-            background: rgba(34,197,94,0.1);
-            border: 1px solid rgba(34,197,94,0.25);
-            color: #4ade80;
+            background: var(--green-bg);
+            border: 1px solid var(--green-br);
+            color: var(--green);
         }
         .status-info {
             background: rgba(245,158,11,0.1);
-            border: 1px solid rgba(245,158,11,0.25);
+            border: 1px solid rgba(245,158,11,0.3);
             color: var(--gold);
         }
 
@@ -540,7 +646,7 @@
             transition: border-color 0.2s, background 0.2s;
             margin-top: 20px;
         }
-        .btn-restart:hover { border-color: var(--accent); background: rgba(79,142,255,0.06); }
+        .btn-restart:hover { border-color: var(--accent); background: var(--surface2); }
 
         /* ── ANIMATIONS ── */
         @keyframes correctPulse {
@@ -558,7 +664,6 @@
         }
         .numbers-arena.shake { animation: shake 0.35s ease; }
 
-        /* ── MOBILE ── */
         @media (max-width: 480px) {
             .result-number { font-size: 4rem; }
             .game-hud { gap: 8px; }
@@ -573,7 +678,14 @@
 
     <header class="header">
         <div class="logo">Num<span>Match</span></div>
-        <div class="badge">v2.1</div>
+        <div class="header-right">
+            <div class="badge">v3.0</div>
+            <button class="theme-toggle" id="themeToggle"
+                aria-label="Переключить тему" title="Переключить тему">
+                <span class="icon-sun" aria-hidden="true">☀️</span>
+                <span class="icon-moon" aria-hidden="true">🌙</span>
+            </button>
+        </div>
     </header>
 
     <main>
@@ -582,7 +694,9 @@
 
             <div id="regBlock" class="card" style="display:none">
                 <div class="card-label">👤 Регистрация</div>
-                <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">Введите имя — оно зафиксируется навсегда</p>
+                <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">
+                    Введите имя — оно зафиксируется навсегда
+                </p>
                 <div class="reg-row">
                     <input class="name-input" id="regInput" type="text"
                         placeholder="Ваш ник" maxlength="20"
@@ -687,7 +801,6 @@
             <button class="btn-restart" onclick="restartGame()">↩ Играть снова</button>
         </div>
     </main>
-
 </div>
 
 <div class="error-flash" aria-live="assertive" aria-atomic="true">
@@ -695,6 +808,36 @@
 </div>
 
 <script>
+    // ── ТЕМА ───────────────────────────────────────────────────────
+    const THEME_KEY = 'nm_theme';
+    const themeToggle = document.getElementById('themeToggle');
+    const metaThemeColor = document.getElementById('metaThemeColor');
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        metaThemeColor.setAttribute('content', theme === 'dark' ? '#080b14' : '#f8fafc');
+    }
+
+    function toggleTheme() {
+        const cur = document.documentElement.getAttribute('data-theme');
+        const next = cur === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        localStorage.setItem(THEME_KEY, next);
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Слушаем смену системной темы (только если пользователь не выбирал вручную)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem(THEME_KEY)) {
+            applyTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+
+    // Применить meta theme-color по текущей теме
+    applyTheme(document.documentElement.getAttribute('data-theme'));
+
+    // ── ИГРА ───────────────────────────────────────────────────────
     const API_LB   = '/api/leaderboard';
     const API_SAVE = '/api/save';
 
@@ -714,7 +857,6 @@
     }
     gs.userId = getUserId();
 
-    // ── Number Generation ──────────────────────────────────────────
     function genNumbers() {
         const len = Math.floor(Math.random() * 10) + 6;
         let base = '';
@@ -742,7 +884,6 @@
         document.getElementById('numB').textContent = gs.cur.b;
     }
 
-    // ── Game Logic ─────────────────────────────────────────────────
     function startGame() {
         if (!gs.registered) return;
         gs.score = 0; gs.errors = 0; gs.timeLeft = 120;
@@ -781,8 +922,9 @@
         } else {
             gs.errors++;
             updateHUD();
-            document.getElementById('arena').classList.add('shake');
-            setTimeout(() => document.getElementById('arena').classList.remove('shake'), 400);
+            const arena = document.getElementById('arena');
+            arena.classList.add('shake');
+            setTimeout(() => arena.classList.remove('shake'), 400);
             showError();
             if (gs.errors >= 2) { setTimeout(endGame, 400); return; }
             showNumbers();
@@ -841,7 +983,6 @@
         });
     }
 
-    // ── Leaderboard ────────────────────────────────────────────────
     async function renderLB(containerId) {
         const el = document.getElementById(containerId);
         try {
@@ -876,7 +1017,6 @@
         }
     }
 
-    // ── Registration ───────────────────────────────────────────────
     async function registerName() {
         const input = document.getElementById('regInput');
         const name  = input.value.trim();
@@ -920,8 +1060,7 @@
         document.getElementById('welcomeBlock').style.display = 'flex';
         document.getElementById('welcomeName').textContent = name;
         document.getElementById('welcomeRecord').textContent = score;
-        const btn = document.getElementById('btnStart');
-        btn.disabled = false;
+        document.getElementById('btnStart').disabled = false;
     }
 
     function showScreen(id) {
@@ -930,7 +1069,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ── Init ───────────────────────────────────────────────────────
     window.onload = async () => {
         const lb = await renderLB('lbStart');
         const me = lb.find(e => e.userId === gs.userId);
