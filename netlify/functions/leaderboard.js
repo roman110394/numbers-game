@@ -9,7 +9,7 @@ exports.handler = async (event, context) => {
         // Кэшируем на CDN-edge 60 сек, в браузере не кэшируем
         // Это значит: первый запрос за 60 сек идёт к функции,
         // все остальные — отдаются с CDN мгновенно
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
+        'Cache-Control': 'no-store, no-cache, must-revalidate'
     };
 
     if (event.httpMethod === 'OPTIONS') {
